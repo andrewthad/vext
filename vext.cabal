@@ -1,0 +1,154 @@
+cabal-version: 3.4
+name: vext
+version: 0.1.0.0
+bug-reports: https://github.com/andrewthad/vex-unified/issues
+license: BSD-3-Clause
+license-file: LICENSE
+author: Andrew Martin
+maintainer: andrew.thaddeus@gmail.com
+copyright: 2019 Andrew Martin
+category: Data
+extra-source-files: CHANGELOG.md
+
+library indef
+  exposed-modules:
+    Vector
+  other-modules:
+    Core
+  signatures:
+    Element
+  build-depends:
+    , base >=4.12.0.0 && <5
+    , natural-arithmetic
+    , unlifted
+  hs-source-dirs: src-indef
+  default-language: Haskell2010
+  ghc-options: -O2 -Wall
+
+library ord-indef
+  exposed-modules:
+    OrdVector
+  signatures:
+    Element
+  build-depends:
+    , base >=4.12.0.0 && <5
+    , natural-arithmetic
+    , vext:indef
+  hs-source-dirs: src-ord-indef
+  default-language: Haskell2010
+  ghc-options: -O2 -Wall
+
+library imp
+  exposed-modules:
+    Word8
+    Word16
+    Word32
+    Int32
+    Lifted
+    Unlifted
+  build-depends:
+    , base >=4.12.0.0 && <5
+    , primitive >=0.7
+    , unlifted
+  hs-source-dirs: src-imp
+  default-language: Haskell2010
+  ghc-options: -O2 -Wall
+
+library inst
+  default-language: Haskell2010
+  ghc-options: -O2 -Wall
+  reexported-modules:
+    , Vector.Std.Lifted
+    , Vector.Std.Word8
+    , Vector.Std.Word16
+    , Vector.Std.Word32
+    , Vector.Std.Int32
+    , Vector.Ord.Int32
+    , Vector.Std.Unlifted
+  build-depends:
+    , vext:imp
+    , vext:indef
+    , vext:ord-indef
+    , primitive >=0.7
+  mixins:
+    vext:indef (Vector as Vector.Std.Word8) requires (Element as Word8),
+    vext:indef (Vector as Vector.Std.Word16) requires (Element as Word16),
+    vext:indef (Vector as Vector.Std.Word32) requires (Element as Word32),
+    vext:indef (Vector as Vector.Std.Int32) requires (Element as Int32),
+    vext:indef (Vector as Vector.Std.Lifted) requires (Element as Lifted),
+    vext:indef (Vector as Vector.Std.Unlifted) requires (Element as Unlifted),
+    vext:ord-indef (OrdVector as Vector.Ord.Int32) requires (Element as Int32),
+
+library pair-indef
+  exposed-modules:
+    Element
+  signatures:
+    ElementA
+    ElementB
+  build-depends:
+    , base >=4.12.0.0 && <5
+  hs-source-dirs: src-pair-indef
+  default-language: Haskell2010
+  ghc-options: -O2 -Wall
+
+library pair-array-inst
+  default-language: Haskell2010
+  ghc-options: -O2 -Wall
+  reexported-modules:
+    , Element.Pair.Lifted.Word8
+    , Element.Pair.Word8.Word8
+  build-depends:
+    , vext:inst
+    , vext:imp
+    , vext:pair-indef
+  mixins:
+    vext:pair-indef (Element as Element.Pair.Lifted.Word8) requires
+      (ElementA as Lifted, ElementB as Word8),
+    vext:pair-indef (Element as Element.Pair.Word8.Word8) requires
+      (ElementA as Word8, ElementB as Word8),
+
+library pair-inst
+  default-language: Haskell2010
+  ghc-options: -O2 -Wall
+  reexported-modules:
+    , Vector.Pair.Word8.Lifted
+    , Vector.Pair.Word8.Word8
+  build-depends:
+    , vext:pair-array-inst
+    , vext:indef
+  mixins:
+    vext:indef (Vector as Vector.Pair.Word8.Lifted) requires
+      (Element as Element.Pair.Lifted.Word8),
+    vext:indef (Vector as Vector.Pair.Word8.Word8) requires
+      (Element as Element.Pair.Word8.Word8),
+
+library
+  default-language: Haskell2010
+  ghc-options: -O2 -Wall
+  reexported-modules:
+    , Vector.Pair.Word8.Lifted
+    , Vector.Pair.Word8.Word8
+    , Vector.Std.Lifted
+    , Vector.Std.Unlifted
+    , Vector.Std.Int32
+    , Vector.Ord.Int32
+    , Vector.Std.Word16
+    , Vector.Std.Word32
+    , Vector.Std.Word8
+  build-depends:
+    , vext:inst
+    , vext:pair-inst
+
+test-suite test 
+  default-language: Haskell2010
+  type: exitcode-stdio-1.0
+  hs-source-dirs: test
+  main-is: Main.hs
+  ghc-options: -Wall -O2
+  build-depends:
+    , base >=4.12.0.0 && <5 
+    , byteslice
+    , vext
+    , tasty >=1.2.3
+    , tasty-quickcheck >=0.10
+    , natural-arithmetic
