@@ -1,4 +1,5 @@
 {-# LANGUAGE BangPatterns #-}
+{-# LANGUAGE PatternSynonyms #-}
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE DerivingStrategies #-}
 {-# LANGUAGE DuplicateRecordFields #-}
@@ -22,6 +23,7 @@ import Test.Tasty.QuickCheck ((===),counterexample)
 import GHC.Int (Int32(I32#))
 import Arithmetic.Types (Nat#)
 import GHC.Exts (Int32#)
+import Data.Unlifted (Bool#,pattern True#,pattern False#)
 
 import qualified Data.Bytes as Bytes
 import qualified Data.List as List
@@ -31,8 +33,8 @@ import qualified Arithmetic.Fin as Fin
 import qualified Arithmetic.Lt as Lt
 import qualified Arithmetic.Nat as Nat
 
-import qualified Vector.Std.Int32 as Int32
-import qualified Vector.Ord.Int32 as Int32
+import qualified Vector.Int32 as Int32
+import qualified Vector.Bit as Bit
 
 main :: IO ()
 main = defaultMain tests
@@ -43,6 +45,14 @@ tests = testGroup "tests"
     [ TQC.testProperty "maximum" $ \a@(I32# a# ) b@(I32# b# ) c@(I32# c# ) d@(I32# d# ) ->
         let v = Int32.maximum (Nat.constant# @4 (# #)) (Lt.constant# (# #)) (Int32.construct4 a# b# c# d#)
          in I32# v === max (max a b) (max c d)
+    , TQC.testProperty "map-eq" $ \a@(I32# a# ) b@(I32# b# ) c@(I32# c# ) d@(I32# d# ) ->
+        let v0 = Int32.mapEq (Nat.constant# @4 (# #)) b# (Int32.construct4 a# b# c# d#)
+            v1 = Bit.construct4
+              (unliftBool $ a == b)
+              True#
+              (unliftBool $ c == b)
+              (unliftBool $ d == b)
+         in Bit.equals (Nat.constant# @4 (# #)) v0 v1
     , TQC.testProperty "bubble-sort-min" $ \a@(I32# a# ) b@(I32# b# ) c@(I32# c# ) d@(I32# d# ) ->
         let v = Int32.bubbleSort (Nat.constant# @4 (# #)) (Int32.construct4 a# b# c# d#)
             v0 = Int32.index0 v
@@ -103,3 +113,8 @@ tests = testGroup "tests"
 
 showI32Vector :: Nat# n -> Int32.Vector n Int32# -> String
 showI32Vector n v = Int32.ifoldl' (\acc _ w -> acc ++ ", " ++ show (I32# w))  "" v n
+
+unliftBool :: Bool -> Bool#
+unliftBool = \case
+  True -> True#
+  False -> False#

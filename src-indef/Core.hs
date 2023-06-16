@@ -48,15 +48,16 @@ module Core
   , index
   , write#
   , write
-  -- , size
-  -- , uninitialized
   , initialized
+  , empty#
+  , empty
   , unsafeShrinkFreeze
   , set
   , unsafeFreeze
   , unsafeFreeze#
   , thaw
   , unsafeCoerceLength
+  , unsafeCoerceVector
   , substitute
   ) where
 
@@ -64,9 +65,10 @@ import Prelude hiding (read,map)
 
 import Arithmetic.Unsafe (Fin#(Fin#))
 import Arithmetic.Unsafe (Nat#(Nat#))
-import Element (R,A#,M#)
+import Rep (R)
+import Element (A#,M#)
 import Data.Kind (Type)
-import GHC.Exts (Int(I#),RuntimeRep(IntRep,TupleRep,BoxedRep),Levity(Unlifted))
+import GHC.Exts (Int(I#),RuntimeRep(IntRep,TupleRep,BoxedRep),Levity(Unlifted),unsafeCoerce#)
 import GHC.Exts (TYPE,State#,Int#,(*#))
 import GHC.ST (ST(ST),runST)
 import GHC.TypeNats (type (+))
@@ -129,6 +131,12 @@ read# :: forall (s :: Type) (n :: GHC.Nat) (a :: TYPE R).
 {-# inline read# #-}
 read# (MutableVector# x) (Fin# i) s = A.read# x i s
 
+empty# :: forall (a :: TYPE R). (# #) -> Vector# 0 a
+empty# _ = Vector# (A.empty# (# #))
+
+empty :: forall (a :: TYPE R). (# #) -> Vector 0 a
+empty _ = Vector (Vector# (A.empty# (# #)))
+
 initialized :: forall (s :: Type) (n :: GHC.Nat) (a :: TYPE R).
      Nat# n
   -> a
@@ -184,3 +192,16 @@ substitute !_ (Vector (Vector# x)) = Vector (Vector# x)
 unsafeCoerceLength :: Arithmetic.Nat n -> Vector m a -> Vector n a
 unsafeCoerceLength !_ (Vector (Vector# x)) = Vector (Vector# x)
 
+-- | Unsafely coerce between two vectors of elements that have same runtime
+-- representation. For boxed types, this is a bad idea. However, we
+-- occassionally need this in order to write functions that validate that all
+-- elements satisfy a condition and then reuse the argument vector.
+-- For example, consider a function that that checks arbitrary 32-bit integers
+-- to see if the are sufficiently bounded:
+--
+-- > toFinite32 :: Nat# m -> Vector n Int32# -> Maybe (Vector n (Fin32# m))
+--
+-- A good implementation of this function should reuse the argument as
+-- the result, and we need @unsafeCoerceVector@ to do this.
+unsafeCoerceVector :: forall (a :: TYPE R) (b :: TYPE R) (n :: GHC.Nat). Vector n a -> Vector n b
+unsafeCoerceVector (Vector (Vector# x)) = Vector (Vector# (unsafeCoerce# x :: A# b))

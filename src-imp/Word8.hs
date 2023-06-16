@@ -10,6 +10,7 @@ module Word8
   ( R
   , A#
   , M#
+  , empty#
   , index#
   , write#
   , read#
@@ -23,6 +24,7 @@ module Word8
 import GHC.Exts
 import Data.Kind (Type)
 import Data.Unlifted (PrimArray#(..),MutablePrimArray#(..))
+import EmptyPrimArray (emptyPrimArray#)
 
 import qualified GHC.Exts as Exts
 
@@ -55,6 +57,9 @@ unsafeFreeze# :: forall (s :: Type) (a :: TYPE R).
   -> (# State# s, A# a #)
 unsafeFreeze# (MutablePrimArray# m) s0 = case unsafeFreezeByteArray# m s0 of
   (# s1, v #) -> (# s1, PrimArray# v #)
+
+empty# :: forall (a :: TYPE R). (# #) -> A# a
+empty# = emptyPrimArray#
 
 initialized# :: forall (s :: Type) (a :: TYPE R).
      Int#

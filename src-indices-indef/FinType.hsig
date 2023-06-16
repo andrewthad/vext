@@ -1,0 +1,13 @@
+{-# language MagicHash #-}
+{-# language KindSignatures #-}
+
+signature FinType where
+
+import FinElement (R)
+import GHC.Exts (TYPE)
+import Arithmetic.Types (Fin#)
+import qualified GHC.TypeNats as GHC
+
+data Finite# :: GHC.Nat -> TYPE R
+
+weaken :: Finite# n -> Fin# n

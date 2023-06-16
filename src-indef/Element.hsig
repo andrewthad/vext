@@ -9,8 +9,8 @@ signature Element where
 
 import Data.Kind (Type)
 import GHC.Exts (TYPE,RuntimeRep(BoxedRep),Levity(Unlifted),State#,Int#)
+import Rep (R)
 
-data R :: RuntimeRep
 data A# :: TYPE R -> TYPE ('BoxedRep 'Unlifted)
 data M# :: Type -> TYPE R -> TYPE ('BoxedRep 'Unlifted)
 
@@ -25,6 +25,10 @@ unsafeShrinkFreeze# :: forall (s :: Type) (a :: TYPE R).
   -> Int#
   -> State# s
   -> (# State# s, A# a #)
+
+-- Length of zero. Does not require an element. Reallocates
+-- every time.
+empty# :: forall (a :: TYPE R). (# #) -> A# a
 
 initialized# :: forall (s :: Type) (a :: TYPE R).
      Int#

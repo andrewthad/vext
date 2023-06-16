@@ -17,6 +17,7 @@ library indef
     Core
   signatures:
     Element
+    Rep
   build-depends:
     , base >=4.12.0.0 && <5
     , natural-arithmetic
@@ -25,27 +26,87 @@ library indef
   default-language: Haskell2010
   ghc-options: -O2 -Wall
 
+library type-eq-indef
+  exposed-modules:
+    TypeEqVector
+  signatures:
+    Element
+    Rep
+    Type
+  build-depends:
+    , base >=4.12.0.0 && <5
+    , natural-arithmetic
+    , unlifted
+    , vext:indef
+  hs-source-dirs: src-type-eq-indef
+  default-language: Haskell2010
+  ghc-options: -O2 -Wall
+
+library rep-eq-indef
+  exposed-modules:
+    EqVector
+  signatures:
+    Element
+    Rep
+  build-depends:
+    , base >=4.12.0.0 && <5
+    , natural-arithmetic
+    , unlifted
+    , vext:indef
+  hs-source-dirs: src-rep-eq-indef
+  default-language: Haskell2010
+  ghc-options: -O2 -Wall
+
 library ord-indef
   exposed-modules:
     OrdVector
   signatures:
     Element
+    Rep
   build-depends:
     , base >=4.12.0.0 && <5
     , natural-arithmetic
+    , unlifted
     , vext:indef
+    , vext:inst-bit
   hs-source-dirs: src-ord-indef
   default-language: Haskell2010
   ghc-options: -O2 -Wall
 
-library imp
+-- Inherits the element signature
+library permute-indef
   exposed-modules:
+    PermuteVector
+  signatures:
+    Element
+    Rep
+    FinElement
+    FinType
+  build-depends:
+    , base >=4.12.0.0 && <5
+    , natural-arithmetic
+    , vext:indef
+    , vext:inst
+  mixins:
+    vext:indef (Vector as Vector) requires (Element as Element, Rep as Rep),
+    vext:indef (Vector as FinVector) requires (Element as FinElement, Rep as FinRep),
+  hs-source-dirs: src-permute-indef
+  default-language: Haskell2010
+  ghc-options: -O2 -Wall
+
+library imp
+  other-modules:
+    EmptyPrimArray
+  exposed-modules:
+    Word1
     Word8
     Word16
     Word32
+    Word64
     Int32
     Lifted
     Unlifted
+    ShortText
   build-depends:
     , base >=4.12.0.0 && <5
     , primitive >=0.7
@@ -53,6 +114,21 @@ library imp
   hs-source-dirs: src-imp
   default-language: Haskell2010
   ghc-options: -O2 -Wall
+
+library inst-bit
+  default-language: Haskell2010
+  ghc-options: -O2 -Wall
+  reexported-modules:
+    , Vector.Std.Word1
+    , Vector.Eq.Word1
+  build-depends:
+    , vext:imp
+    , vext:indef
+    , vext:rep-eq-indef
+    , primitive >=0.7
+  mixins:
+    vext:indef (Vector as Vector.Std.Word1) requires (Element as Word1, Rep as Word1),
+    vext:rep-eq-indef (EqVector as Vector.Eq.Word1) requires (Element as Word1, Rep as Word1),
 
 library inst
   default-language: Haskell2010
@@ -62,6 +138,7 @@ library inst
     , Vector.Std.Word8
     , Vector.Std.Word16
     , Vector.Std.Word32
+    , Vector.Std.Word64
     , Vector.Std.Int32
     , Vector.Ord.Int32
     , Vector.Std.Unlifted
@@ -69,27 +146,52 @@ library inst
     , vext:imp
     , vext:indef
     , vext:ord-indef
+    , vext:type-eq-indef
     , primitive >=0.7
   mixins:
-    vext:indef (Vector as Vector.Std.Word8) requires (Element as Word8),
-    vext:indef (Vector as Vector.Std.Word16) requires (Element as Word16),
-    vext:indef (Vector as Vector.Std.Word32) requires (Element as Word32),
-    vext:indef (Vector as Vector.Std.Int32) requires (Element as Int32),
-    vext:indef (Vector as Vector.Std.Lifted) requires (Element as Lifted),
-    vext:indef (Vector as Vector.Std.Unlifted) requires (Element as Unlifted),
-    vext:ord-indef (OrdVector as Vector.Ord.Int32) requires (Element as Int32),
+    vext:indef (Vector as Vector.Std.Word8) requires (Element as Word8, Rep as Word8),
+    vext:indef (Vector as Vector.Std.Word16) requires (Element as Word16, Rep as Word16),
+    vext:indef (Vector as Vector.Std.Word32) requires (Element as Word32, Rep as Word32),
+    vext:indef (Vector as Vector.Std.Word64) requires (Element as Word64, Rep as Word64),
+    vext:indef (Vector as Vector.Std.Int32) requires (Element as Int32, Rep as Int32),
+    vext:indef (Vector as Vector.Std.Lifted) requires (Element as Lifted, Rep as Lifted),
+    vext:indef (Vector as Vector.Std.Unlifted) requires (Element as Unlifted, Rep as Unlifted),
+    vext:type-eq-indef (TypeEqVector as Vector.Std.Unlifted.Eq.ShortText)
+      requires (Element as Unlifted, Rep as Unlifted, Type as ShortText),
+    vext:ord-indef (OrdVector as Vector.Ord.Int32) requires (Element as Int32, Rep as Int32),
 
 library pair-indef
   exposed-modules:
     Element
+    Rep
   signatures:
     ElementA
     ElementB
+    RepA
+    RepB
   build-depends:
     , base >=4.12.0.0 && <5
   hs-source-dirs: src-pair-indef
   default-language: Haskell2010
   ghc-options: -O2 -Wall
+
+library triple-indef
+  exposed-modules:
+    Element
+    Rep
+  signatures:
+    ElementA
+    ElementB
+    ElementC
+    RepA
+    RepB
+    RepC
+  build-depends:
+    , base >=4.12.0.0 && <5
+  hs-source-dirs: src-triple-indef
+  default-language: Haskell2010
+  ghc-options: -O2 -Wall
+
 
 library pair-array-inst
   default-language: Haskell2010
@@ -103,9 +205,9 @@ library pair-array-inst
     , vext:pair-indef
   mixins:
     vext:pair-indef (Element as Element.Pair.Lifted.Word8) requires
-      (ElementA as Lifted, ElementB as Word8),
+      (ElementA as Lifted, ElementB as Word8, RepA as Lifted, RepB as Word8),
     vext:pair-indef (Element as Element.Pair.Word8.Word8) requires
-      (ElementA as Word8, ElementB as Word8),
+      (ElementA as Word8, ElementB as Word8, RepA as Word8, RepB as Word8),
 
 library pair-inst
   default-language: Haskell2010
@@ -118,11 +220,12 @@ library pair-inst
     , vext:indef
   mixins:
     vext:indef (Vector as Vector.Pair.Word8.Lifted) requires
-      (Element as Element.Pair.Lifted.Word8),
+      (Element as Element.Pair.Lifted.Word8, Rep as Element.Pair.Lifted.Word8),
     vext:indef (Vector as Vector.Pair.Word8.Word8) requires
-      (Element as Element.Pair.Word8.Word8),
+      (Element as Element.Pair.Word8.Word8, Rep as Element.Pair.Word8.Word8),
 
 library
+  hs-source-dirs: src
   default-language: Haskell2010
   ghc-options: -O2 -Wall
   reexported-modules:
@@ -135,9 +238,14 @@ library
     , Vector.Std.Word16
     , Vector.Std.Word32
     , Vector.Std.Word8
+  exposed-modules:
+    Vector.Bit
+    Vector.Int32
   build-depends:
+    , base >=4.12.0.0 && <5 
     , vext:inst
     , vext:pair-inst
+    , vext:inst-bit
 
 test-suite test 
   default-language: Haskell2010
@@ -152,3 +260,4 @@ test-suite test
     , tasty >=1.2.3
     , tasty-quickcheck >=0.10
     , natural-arithmetic
+    , unlifted

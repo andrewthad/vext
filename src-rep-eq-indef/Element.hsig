@@ -5,11 +5,11 @@
 {-# language UnboxedTuples #-}
 {-# language TypeFamilies #-}
 
-signature ElementA where
+signature Element where
 
 import Data.Kind (Type)
 import GHC.Exts (TYPE,RuntimeRep(BoxedRep),Levity(Unlifted),State#,Int#)
-import RepA (R)
+import Rep (R)
 
 data A# :: TYPE R -> TYPE ('BoxedRep 'Unlifted)
 data M# :: Type -> TYPE R -> TYPE ('BoxedRep 'Unlifted)
@@ -59,10 +59,4 @@ thaw# :: forall (s :: Type) (a :: TYPE R).
   -> State# s
   -> (# State# s, M# s a #)
 
-read# :: forall (s :: Type) (a :: TYPE R).
-     M# s a
-  -> Int#
-  -> State# s
-  -> (# State# s, a #)
 
-empty# :: forall (a :: TYPE R). (# #) -> A# a

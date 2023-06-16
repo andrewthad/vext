@@ -1,19 +1,21 @@
+{-# language BangPatterns #-}
 {-# language GADTSyntax #-}
 {-# language MagicHash #-}
 {-# language RankNTypes #-}
 {-# language ScopedTypeVariables #-}
+{-# language StandaloneKindSignatures #-}
 {-# language TypeApplications #-}
 {-# language TypeFamilies #-}
 {-# language TypeInType #-}
 {-# language UnboxedTuples #-}
 {-# language UnliftedNewtypes #-}
-{-# language StandaloneKindSignatures #-}
 
 module Unlifted
   ( R
   , A#
   , ArrayRep
   , M#
+  , empty#
   , index#
   , write#
   , read#
@@ -27,6 +29,7 @@ module Unlifted
 
 import GHC.Exts
 import Data.Kind (Type)
+import Unsafe.Coerce (unsafeCoerceUnlifted)
 
 import qualified GHC.Exts as Exts
 
@@ -66,6 +69,18 @@ initialized# :: forall (s :: Type) (a :: TYPE R).
   -> State# s
   -> (# State# s, M# s a #)
 initialized# i a s = newArray# i a s
+
+-- This implementation is ridiculous, but GHC does not currently give
+-- us a way to allocate an empty array of unlifted elements without
+-- supplying an element.
+empty# :: forall (a :: TYPE R). (# #) -> A# a
+empty# _ = 
+  let !(# _, z #) = Exts.runRW#
+        (\s0 -> case Exts.newByteArray# 0# s0 of
+          (# s1, placeholder #) -> case Exts.newArray# 0# (unsafeCoerceUnlifted @_ @a placeholder) s1 of
+            (# s2, x #) -> Exts.unsafeFreezeArray# x s2
+        )
+   in z
 
 set# :: forall (s :: Type) (a :: TYPE R).
      M# s a

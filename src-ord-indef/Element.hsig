@@ -9,16 +9,10 @@ signature Element where
 
 import Data.Kind (Type)
 import GHC.Exts (TYPE,RuntimeRep(BoxedRep),Levity(Unlifted),State#,Int#)
+import Rep (R)
 
-data R :: RuntimeRep
 data A# :: TYPE R -> TYPE ('BoxedRep 'Unlifted)
 data M# :: Type -> TYPE R -> TYPE ('BoxedRep 'Unlifted)
-
-eq# :: forall (a :: TYPE R). a -> a -> Int#
-eq :: forall (a :: TYPE R). a -> a -> Bool
-lt# :: forall (a :: TYPE R). a -> a -> Int#
-gt# :: forall (a :: TYPE R). a -> a -> Int#
-max :: forall (a :: TYPE R). a -> a -> a
 
 unsafeFreeze# :: forall (s :: Type) (a :: TYPE R).
      M# s a

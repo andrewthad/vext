@@ -1,0 +1,13 @@
+{-# language KindSignatures #-}
+{-# language RankNTypes #-}
+{-# language MagicHash #-}
+
+signature Type where
+
+import GHC.Exts (TYPE,RuntimeRep,Int#)
+import Rep (R)
+
+data E :: TYPE R
+
+eq# :: E -> E -> Int#
+eq :: E -> E -> Bool

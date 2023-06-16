@@ -1,8 +1,10 @@
+{-# language BangPatterns #-}
 {-# language MagicHash #-}
 {-# language RankNTypes #-}
 {-# language TypeApplications #-}
 {-# language TypeFamilies #-}
 {-# language TypeInType #-}
+{-# language ScopedTypeVariables #-}
 {-# language StandaloneKindSignatures #-}
 {-# language UnboxedTuples #-}
 
@@ -11,6 +13,7 @@ module Lifted
   , A#
   , ArrayRep
   , M#
+  , empty#
   , index#
   , write#
   , read#
@@ -68,6 +71,14 @@ initialized# :: forall (s :: Type) (a :: TYPE R).
   -> State# s
   -> (# State# s, M# s a #)
 initialized# i a s = newArray# i a s
+
+empty# :: forall (a :: TYPE R). (# #) -> A# a
+empty# _ = 
+  let !(# _, z :: Array# a #) = Exts.runRW#
+        (\s0 -> case Exts.newArray# 0# (errorThunk :: a) s0 of
+          (# s1, x #) -> Exts.unsafeFreezeArray# x s1
+        )
+   in z
 
 set# :: forall (s :: Type) (a :: TYPE R).
      M# s a

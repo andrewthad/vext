@@ -42,6 +42,8 @@ import qualified ElementA as A
 import qualified RepA as A
 import qualified ElementB as B
 import qualified RepB as B
+import qualified ElementC as C
+import qualified RepC as C
 
 -- Warning: Using this data constructor directly is dangerous.
 -- Most functions in this module use unsafe coerce to go between
@@ -49,25 +51,27 @@ import qualified RepB as B
 -- important that the matching component of r agrees with this type.
 -- If not, you end up with segfaults.
 data A# :: TYPE R -> TYPE ('BoxedRep 'Unlifted) where
-  A# :: forall (a :: TYPE A.R) (b :: TYPE B.R) (r :: TYPE R).
+  A# :: forall (a :: TYPE A.R) (b :: TYPE B.R) (c :: TYPE C.R) (r :: TYPE R).
         A.A# a
      -> B.A# b
+     -> C.A# c
      -> A# r
 
 data M# :: Type -> TYPE R -> TYPE ('BoxedRep 'Unlifted) where
-  M# :: forall (s :: Type) (a :: TYPE A.R) (b :: TYPE B.R) (r :: TYPE R).
+  M# :: forall (s :: Type) (a :: TYPE A.R) (b :: TYPE B.R) (c :: TYPE C.R) (r :: TYPE R).
         A.M# s a
      -> B.M# s b
+     -> C.M# s c
      -> M# s r
 
 unsafeFromTuple ::
-  forall (a :: TYPE A.R) (b :: TYPE B.R) (x :: TYPE ('TupleRep '[A.R, B.R])).
-  (# a, b #) -> x
+  forall (a :: TYPE A.R) (b :: TYPE B.R) (c :: TYPE C.R) (x :: TYPE ('TupleRep '[A.R, B.R, C.R])).
+  (# a, b, c #) -> x
 unsafeFromTuple x = unsafeCoerce# x
 
 unsafeToTuple ::
-  forall (a :: TYPE A.R) (b :: TYPE B.R) (x :: TYPE ('TupleRep '[A.R, B.R])).
-  x -> (# a, b #)
+  forall (a :: TYPE A.R) (b :: TYPE B.R) (c :: TYPE C.R) (x :: TYPE ('TupleRep '[A.R, B.R, C.R])).
+  x -> (# a, b, c #)
 unsafeToTuple x = unsafeCoerce# x
 
 initialized# :: forall (s :: Type) (a :: TYPE R).
@@ -76,26 +80,29 @@ initialized# :: forall (s :: Type) (a :: TYPE R).
   -> State# s
   -> (# State# s, M# s a #)
 initialized# n e s0 = case unsafeToTuple e of
-  (# a, b #) -> case A.initialized# n a s0 of
+  (# a, b, c #) -> case A.initialized# n a s0 of
     (# s1, av #) -> case B.initialized# n b s1 of
-      (# s2, bv #) -> (# s2, M# av bv #)
+      (# s2, bv #) -> case C.initialized# n c s2 of
+        (# s3, cv #) -> (# s3, M# av bv cv #)
 
 unsafeFreeze# :: forall (s :: Type) (a :: TYPE R).
      M# s a
   -> State# s
   -> (# State# s, A# a #)
-unsafeFreeze# (M# a b) s0 = case A.unsafeFreeze# a s0 of
+unsafeFreeze# (M# a b c) s0 = case A.unsafeFreeze# a s0 of
   (# s1, a' #) -> case B.unsafeFreeze# b s1 of
-    (# s2, b' #) -> (# s2, A# a' b' #)
+    (# s2, b' #) -> case C.unsafeFreeze# c s2 of
+      (# s3, c' #) -> (# s3, A# a' b' c' #)
 
 unsafeShrinkFreeze# :: forall (s :: Type) (a :: TYPE R).
      M# s a
   -> Int#
   -> State# s
   -> (# State# s, A# a #)
-unsafeShrinkFreeze# (M# a b) n s0 = case A.unsafeShrinkFreeze# a n s0 of
+unsafeShrinkFreeze# (M# a b c) n s0 = case A.unsafeShrinkFreeze# a n s0 of
   (# s1, a' #) -> case B.unsafeShrinkFreeze# b n s1 of
-    (# s2, b' #) -> (# s2, A# a' b' #)
+    (# s2, b' #) -> case C.unsafeShrinkFreeze# c n s2 of
+      (# s3, c' #) -> (# s3, A# a' b' c' #)
 
 thaw# :: forall (s :: Type) (a :: TYPE R).
      A# a
@@ -103,29 +110,32 @@ thaw# :: forall (s :: Type) (a :: TYPE R).
   -> Int#
   -> State# s
   -> (# State# s, M# s a #)
-thaw# (A# a b) off len s0 = case A.thaw# a off len s0 of
+thaw# (A# a b c) off len s0 = case A.thaw# a off len s0 of
   (# s1, a' #) -> case B.thaw# b off len s1 of
-    (# s2, b' #) -> (# s2, M# a' b' #)
+    (# s2, b' #) -> case C.thaw# c off len s2 of
+      (# s3, c' #) -> (# s3, M# a' b' c' #)
 
 index# :: forall (a :: TYPE R).
      A# a
   -> Int#
   -> a
-index# (A# x y) ix =
-  unsafeFromTuple (# A.index# x ix, B.index# y ix #)
+index# (A# x y z) ix =
+  unsafeFromTuple (# A.index# x ix, B.index# y ix, C.index# z ix #)
 
 write# :: forall (s :: Type) (a :: TYPE R).
   M# s a -> Int# -> a -> State# s -> State# s
-write# (M# dstA dstB) ix e s0 = case unsafeToTuple e of
-  (# a, b #) -> case A.write# dstA ix a s0 of
-    s1 -> B.write# dstB ix b s1
+write# (M# dstA dstB dstC) ix e s0 = case unsafeToTuple e of
+  (# a, b, c #) -> case A.write# dstA ix a s0 of
+    s1 -> case B.write# dstB ix b s1 of
+      s2 -> C.write# dstC ix c s2
 
 read# :: forall (s :: Type) (a :: TYPE R).
   M# s a -> Int# -> State# s -> (# State# s, a #)
-read# (M# dstA dstB) ix s0 = case A.read# dstA ix s0 of
+read# (M# dstA dstB dstC) ix s0 = case A.read# dstA ix s0 of
   (# s1, a #) -> case B.read# dstB ix s1 of
-    (# s2, b #) -> case unsafeFromTuple (# a, b #) of
-      r -> (# s2, r #)
+    (# s2, b #) -> case C.read# dstC ix s2 of
+      (# s3, c #) -> case unsafeFromTuple (# a, b, c #) of
+        r -> (# s3, r #)
 
 set# :: forall (s :: Type) (a :: TYPE R).
      M# s a
@@ -134,9 +144,10 @@ set# :: forall (s :: Type) (a :: TYPE R).
   -> a
   -> State# s
   -> State# s
-set# (M# dstA dstB) off0 len0 e s0 = case unsafeToTuple e of
-  (# a, b #) -> case A.set# dstA off0 len0 a s0 of
-    s1 -> B.set# dstB off0 len0 b s1
+set# (M# dstA dstB dstC) off0 len0 e s0 = case unsafeToTuple e of
+  (# a, b, c #) -> case A.set# dstA off0 len0 a s0 of
+    s1 -> case B.set# dstB off0 len0 b s1 of
+      s2 -> C.set# dstC off0 len0 c s2
 
 empty# :: forall (a :: TYPE R). (# #) -> A# a
-empty# _ = A# (A.empty# (# #)) (B.empty# (# #))
+empty# _ = A# (A.empty# (# #)) (B.empty# (# #)) (C.empty# (# #))

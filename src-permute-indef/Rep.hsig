@@ -1,0 +1,7 @@
+{-# language KindSignatures #-}
+
+signature Rep where
+
+import GHC.Exts (RuntimeRep)
+
+data R :: RuntimeRep

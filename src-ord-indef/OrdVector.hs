@@ -5,6 +5,7 @@
 {-# language GADTs #-}
 {-# language KindSignatures #-}
 {-# language MagicHash #-}
+{-# language PatternSynonyms #-}
 {-# language UnliftedNewtypes #-}
 {-# language RankNTypes #-}
 {-# language ScopedTypeVariables #-}
@@ -18,9 +19,12 @@
 module OrdVector
   ( unique
   , equals
+  , mapEq
+    -- * Maximum
   , maximum
   , maximumSlice
   , maximumSliceInitial
+    -- * Bubble Sort
   , bubbleSort
   , bubbleSortSlice
   , bubbleSortSliceInPlace
@@ -28,7 +32,7 @@ module OrdVector
 
 import Prelude hiding (Bounded,max,min,maximum)
 
-import Element (R,eq,max)
+import Rep (R,eq,max)
 import Vector (MutableVector(MutableVector),MutableVector#,Vector,Bounded(Bounded),index,write,write#,thaw,read#,unsafeShrinkFreeze,unsafeFreeze)
 import GHC.ST (ST(ST),runST)
 import Arithmetic.Types (type (<),Fin(Fin),Nat#)
@@ -37,16 +41,40 @@ import Arithmetic.Types (type (<#),type (<=#))
 import Arithmetic.Nat ((<?),(<?#))
 import GHC.TypeNats (type (+))
 import GHC.Exts (TYPE,State#)
+import Data.Unlifted (Bool#,pattern True#,pattern False#)
 
 import qualified GHC.TypeNats as GHC
 import qualified Element
+import qualified Rep
 import qualified Arithmetic.Lt as Lt
 import qualified Arithmetic.Lte as Lte
 import qualified Arithmetic.Nat as Nat
 import qualified Arithmetic.Fin as Fin
 import qualified Vector
+import qualified Vector as V
+import qualified Vector.Std.Word1 as BV
+
+-- | Test every element in the vector for equality with a scalar value. Returns
+-- a vector of booleans.
+--
+-- Note: The performance of this function could be improved by accumulating
+-- 8 or 64 results at a time and writing them out all at once. We need to
+-- create a safe interface for doing this though.
+mapEq :: forall (n :: GHC.Nat) (a :: TYPE R).
+     Nat# n -- ^ Source length
+  -> a -- ^ Element to compare against
+  -> Vector n a -- ^ Source array
+  -> BV.Vector n Bool#
+mapEq n e v = runST $ do
+  dst <- BV.initialized n False#
+  Fin.ascendM_# n $ \fin -> if eq e (V.index v fin)
+    then BV.write dst fin True#
+    else pure ()
+  BV.unsafeFreeze dst
 
 -- | Compare two vectors for equality.
+--
+-- TODO: reexport this instead
 equals :: Nat# n -> Vector n a -> Vector n a -> Bool
 equals !n !v0 !v1 = Fin.descend (Nat.lift n) True $ \fin acc ->
   eq (index v0 (Fin.unlift fin)) (index v1 (Fin.unlift fin))
@@ -137,7 +165,7 @@ bubbleSortSliceInPlace lte0 (MutableVector tgt) i0 n =
                   k1 = Fin.construct# (Lt.transitiveNonstrictR# jsuccltm lte0) (Nat.succ# j)
                in case read# tgt k0 si0 of
                     (# si1, e0 #) -> case read# tgt k1 si1 of
-                      (# si2, e1 #) -> case Element.gt# e0 e1 of
+                      (# si2, e1 #) -> case Rep.gt# e0 e1 of
                         0# -> inner (Nat.succ# j) si2
                         _ -> case write# tgt k1 e0 si2 of
                           si3 -> case write# tgt k0 e1 si3 of

@@ -33,7 +33,10 @@ module Vector
   , unlift
   , C.substitute
   , C.initialized
+  , C.empty#
+  , C.empty
   , C.unsafeCoerceLength
+  , C.unsafeCoerceVector
     -- * Ranges
   , C.set
     -- * Freeze
@@ -62,7 +65,8 @@ import Prelude hiding (read,map,Bounded,replicate)
 
 import Core (Vector(..),Vector#,MutableVector(..),unsafeFreeze,index,write)
 import Data.Unlifted (Maybe#(..))
-import Element (R,A#,M#)
+import Rep (R)
+import Element (A#,M#)
 import GHC.Exts (Int(I#),RuntimeRep)
 import GHC.ST (ST,runST)
 import Data.Kind (Type)

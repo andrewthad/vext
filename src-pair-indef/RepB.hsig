@@ -1,0 +1,12 @@
+{-# language DataKinds #-}
+{-# language KindSignatures #-}
+{-# language MagicHash #-}
+{-# language RankNTypes #-}
+{-# language UnboxedTuples #-}
+{-# language TypeFamilies #-}
+
+signature RepB where
+
+import GHC.Exts (RuntimeRep)
+
+data R :: RuntimeRep

@@ -1,0 +1,15 @@
+{-# language KindSignatures #-}
+{-# language RankNTypes #-}
+{-# language MagicHash #-}
+
+signature Rep where
+
+import GHC.Exts (TYPE,RuntimeRep,Int#)
+
+data R :: RuntimeRep
+
+eq# :: forall (a :: TYPE R). a -> a -> Int#
+eq :: forall (a :: TYPE R). a -> a -> Bool
+lt# :: forall (a :: TYPE R). a -> a -> Int#
+gt# :: forall (a :: TYPE R). a -> a -> Int#
+max :: forall (a :: TYPE R). a -> a -> a

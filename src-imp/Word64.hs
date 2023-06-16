@@ -7,7 +7,7 @@
 {-# language StandaloneKindSignatures #-}
 {-# language UnboxedTuples #-}
 
-module Word32
+module Word64
   ( R
   , A#
   , M#
@@ -29,27 +29,27 @@ import EmptyPrimArray (emptyPrimArray#)
 
 import qualified GHC.Exts as Exts
 
-type A# = PrimArray# @'Word32Rep
-type M# = MutablePrimArray# @'Word32Rep
-type R = 'Word32Rep
+type A# = PrimArray# @'Word64Rep
+type M# = MutablePrimArray# @'Word64Rep
+type R = 'Word64Rep
 
-unsafeFromW32 :: forall (a :: TYPE 'Word32Rep). Word32# -> a
-unsafeFromW32 x = unsafeCoerce# x
+unsafeFromW64 :: forall (a :: TYPE 'Word64Rep). Word64# -> a
+unsafeFromW64 x = unsafeCoerce# x
 
-unsafeToW32 :: forall (a :: TYPE 'Word32Rep). a -> Word32#
-unsafeToW32 x = unsafeCoerce# x
+unsafeToW64 :: forall (a :: TYPE 'Word64Rep). a -> Word64#
+unsafeToW64 x = unsafeCoerce# x
 
 index# :: forall (a :: TYPE R). A# a -> Int# -> a
-index# (PrimArray# a) i = unsafeFromW32 (indexWord32Array# a i)
+index# (PrimArray# a) i = unsafeFromW64 (indexWord64Array# a i)
 
 write# :: forall (s :: Type) (a :: TYPE R).
   M# s a -> Int# -> a -> State# s -> State# s
-write# (MutablePrimArray# m) ix a s = writeWord32Array# m ix (unsafeToW32 a) s
+write# (MutablePrimArray# m) ix a s = writeWord64Array# m ix (unsafeToW64 a) s
 
 read# :: forall (s :: Type) (a :: TYPE R).
   M# s a -> Int# -> State# s -> (# State# s, a #)
-read# (MutablePrimArray# m) ix s = case readWord32Array# m ix s of
-  (# s', r #) -> case unsafeFromW32 r of
+read# (MutablePrimArray# m) ix s = case readWord64Array# m ix s of
+  (# s', r #) -> case unsafeFromW64 r of
     r' -> (# s', r' #)
 
 unsafeFreeze# :: forall (s :: Type) (a :: TYPE R).
@@ -67,9 +67,9 @@ initialized# :: forall (s :: Type) (a :: TYPE R).
   -> a
   -> State# s
   -> (# State# s, M# s a #)
-initialized# n a s0 = case newByteArray# (n *# 4# ) s0 of
-  (# s1, b #) -> case Exts.word32ToWord# (unsafeToW32 a) of
-    0## -> case Exts.setByteArray# b 0# (n *# 4#) 0# s1 of
+initialized# n a s0 = case newByteArray# (n *# 8# ) s0 of
+  (# s1, b #) -> case Exts.word64ToWord# (unsafeToW64 a) of
+    0## -> case Exts.setByteArray# b 0# (n *# 8#) 0# s1 of
       s2 -> (# s2, MutablePrimArray# b #)
     _ -> case setLoop# (MutablePrimArray# b) 0# n a s1 of
       s2 -> (# s2, MutablePrimArray# b #)
@@ -87,8 +87,8 @@ set# :: forall (s :: Type) (a :: TYPE R).
   -> a
   -> State# s
   -> State# s
-set# m@(MutablePrimArray# b) off0 len0 a s0 = case Exts.word32ToWord# (unsafeToW32 a) of
-  0## -> Exts.setByteArray# b (off0 *# 4# ) (len0 *# 4# ) 0# s0
+set# m@(MutablePrimArray# b) off0 len0 a s0 = case Exts.word64ToWord# (unsafeToW64 a) of
+  0## -> Exts.setByteArray# b (off0 *# 8# ) (len0 *# 8# ) 0# s0
   _ -> setLoop# m off0 len0 a s0
 
 -- shrink and freeze, all at once
@@ -98,7 +98,7 @@ unsafeShrinkFreeze# ::
   -> State# s
   -> (# State# s, A# a #)
 unsafeShrinkFreeze# (MutablePrimArray# m) elemCount s0Alpha =
-  let !byteCount = elemCount *# 4#
+  let !byteCount = elemCount *# 8#
    in case getSizeofMutableByteArray# m s0Alpha of
         (# s0, sz #) -> case sz ==# byteCount of
           1# -> case Exts.unsafeFreezeByteArray# m s0 of
@@ -113,8 +113,9 @@ thaw# :: forall (s :: Type) (a :: TYPE R).
   -> Int#
   -> State# s
   -> (# State# s, M# s a #)
-thaw# (PrimArray# v) off len s0 = case Exts.newByteArray# (len *# 4# ) s0 of
-  (# s1, m #) -> case Exts.copyByteArray# v (off *# 4# ) m 0# (len *# 4# ) s1 of
+thaw# (PrimArray# v) off len s0 = case Exts.newByteArray# (len *# 8# ) s0 of
+  (# s1, m #) -> case Exts.copyByteArray# v (off *# 8# ) m 0# (len *# 8# ) s1 of
     s2 -> (# s2, MutablePrimArray# m #)
+
 
 
