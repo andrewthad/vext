@@ -42,6 +42,7 @@ module Word1
   , set#
   , unsafeShrinkFreeze#
   , thaw#
+  , freeze#
   ) where
 
 import GHC.Exts
@@ -233,7 +234,13 @@ min# :: Int# -> Int# -> Int#
 min# a b = if isTrue# (a <# b) then a else b
 
 copy# :: forall (s :: Type) (a :: TYPE R).
-  M# s a -> Int# -> A# a -> Int# -> Int# -> State# s -> State# s
+     M# s a -- destination
+  -> Int# -- destination offset
+  -> A# a -- source
+  -> Int# -- source offset
+  -> Int# -- length
+  -> State# s
+  -> State# s
 copy# (MutablePrimArray# dst) doff (PrimArray# src) soff len st =
   internalCopy# dst doff src soff len st
 
@@ -271,3 +278,20 @@ thaw# :: forall (s :: Type) (a :: TYPE R).
 thaw# v off len s0 = case initialized# len (unsafeFromWord 0## ) s0 of
   (# s1, m #) -> case copy# m 0# v off len s1 of
     s2 -> (# s2, m #)
+
+freeze# :: forall (s :: Type) (a :: TYPE R).
+     M# s a
+  -> Int#
+  -> Int#
+  -> State# s
+  -> (# State# s, A# a #)
+freeze# (MutablePrimArray# v) off len s0 = case off of
+  0# ->
+    let !(# wordSz, subWordSz #) = splitIndex_ len
+        !paddedSz = wordSz +# if isTrue# (subWordSz ==# 0#) then 0# else 1#
+        !szBytes = paddedSz *# 8#
+     in case Exts.newByteArray# szBytes s0 of
+          (# s1, m #) -> case Exts.copyMutableByteArray# v 0# m 0# szBytes s1 of
+            s2 -> case Exts.unsafeFreezeByteArray# m s2 of
+              (# s3, x #) -> (# s3, PrimArray# x #)
+  _ -> errorWithoutStackTrace "vext:imp:Word1.freeze#: write the non-zero case"

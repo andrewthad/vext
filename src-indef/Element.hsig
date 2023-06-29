@@ -19,6 +19,13 @@ unsafeFreeze# :: forall (s :: Type) (a :: TYPE R).
   -> State# s
   -> (# State# s, A# a #)
 
+freeze# :: forall (s :: Type) (a :: TYPE R).
+     M# s a
+  -> Int# -- offset
+  -> Int# -- length
+  -> State# s
+  -> (# State# s, A# a #)
+
 -- This is a shrink-and-freeze operation
 unsafeShrinkFreeze# :: forall (s :: Type) (a :: TYPE R).
      M# s a

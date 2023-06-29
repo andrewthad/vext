@@ -52,13 +52,16 @@ module Core
   , empty#
   , empty
   , unsafeShrinkFreeze
-  , set
+  , setSlice
+  , freezeSlice
   , unsafeFreeze
   , unsafeFreeze#
-  , thaw
+  , thawSlice
   , unsafeCoerceLength
   , unsafeCoerceVector
   , substitute
+  , expose
+  , expose#
   ) where
 
 import Prelude hiding (read,map)
@@ -91,14 +94,14 @@ data MutableVector :: Type -> GHC.Nat -> TYPE R -> Type where
 newtype MutableVector# :: Type -> GHC.Nat -> TYPE R -> TYPE ('BoxedRep 'Unlifted) where
   MutableVector# :: M# s a -> MutableVector# s n a
 
-set :: 
-     (i + n <= m)
+setSlice :: 
+     (i + n <=# m)
   -> MutableVector s n a
   -> Nat# i
   -> Nat# m
   -> a
   -> ST s ()
-set _ (MutableVector (MutableVector# x)) (Nat# off) (Nat# len) a =
+setSlice _ (MutableVector (MutableVector# x)) (Nat# off) (Nat# len) a =
   ST $ \s -> case A.set# x off len a s of
     s' -> (# s', () #)
 
@@ -162,6 +165,16 @@ unsafeShrinkFreeze _ (MutableVector (MutableVector# m)) (Nat# n) =
   ST \s -> case A.unsafeShrinkFreeze# m n s of
     (# s', y #) -> (# s', Vector (Vector# y) #)
 
+freezeSlice ::
+     (i + n <=# m)
+  -> MutableVector s m a
+  -> Nat# i
+  -> Nat# n
+  -> ST s (Vector n a)
+freezeSlice _ (MutableVector (MutableVector# m)) (Nat# off) (Nat# len) =
+  ST \s -> case A.freeze# m off len s of
+    (# s', y #) -> (# s', Vector (Vector# y) #)
+
 unsafeFreeze :: forall (s :: Type) (n :: GHC.Nat) (a :: TYPE R).
   MutableVector s n a -> ST s (Vector n a)
 unsafeFreeze (MutableVector (MutableVector# m)) =
@@ -174,13 +187,13 @@ unsafeFreeze# (MutableVector# m) s0 =
   case A.unsafeFreeze# m s0 of
     (# s1, y #) -> (# s1, Vector# y #)
 
-thaw ::
+thawSlice ::
      (i + n <=# m)
   -> Vector m a
   -> Nat# i
   -> Nat# n
   -> ST s (MutableVector s n a)
-thaw _ (Vector (Vector# v)) (Nat# off) (Nat# len) = ST $ \s0 ->
+thawSlice _ (Vector (Vector# v)) (Nat# off) (Nat# len) = ST $ \s0 ->
   case A.thaw# v off len s0 of
     (# s1, mv #) -> (# s1, MutableVector (MutableVector# mv) #)
 
@@ -190,6 +203,7 @@ substitute !_ (Vector (Vector# x)) = Vector (Vector# x)
 -- | Tell the type system that a vector has a certain length
 --   without proving it.
 unsafeCoerceLength :: Arithmetic.Nat n -> Vector m a -> Vector n a
+{-# inline unsafeCoerceLength #-}
 unsafeCoerceLength !_ (Vector (Vector# x)) = Vector (Vector# x)
 
 -- | Unsafely coerce between two vectors of elements that have same runtime
@@ -204,4 +218,13 @@ unsafeCoerceLength !_ (Vector (Vector# x)) = Vector (Vector# x)
 -- A good implementation of this function should reuse the argument as
 -- the result, and we need @unsafeCoerceVector@ to do this.
 unsafeCoerceVector :: forall (a :: TYPE R) (b :: TYPE R) (n :: GHC.Nat). Vector n a -> Vector n b
+{-# inline unsafeCoerceVector #-}
 unsafeCoerceVector (Vector (Vector# x)) = Vector (Vector# (unsafeCoerce# x :: A# b))
+
+expose :: Vector n a -> A# a
+{-# inline expose #-}
+expose (Vector (Vector# x)) = x
+
+expose# :: Vector# n a -> A# a
+{-# inline expose# #-}
+expose# (Vector# x) = x

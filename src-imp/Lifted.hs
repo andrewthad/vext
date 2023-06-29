@@ -23,6 +23,7 @@ module Lifted
   , set#
   , unsafeShrinkFreeze#
   , thaw#
+  , freeze#
   ) where
 
 import GHC.Exts
@@ -115,3 +116,11 @@ thaw# = Exts.thawArray#
 errorThunk :: a
 {-# noinline errorThunk #-}
 errorThunk = error "Array: uninitialized element"
+
+freeze# :: forall (s :: Type) (a :: TYPE R).
+     M# s a
+  -> Int#
+  -> Int#
+  -> State# s
+  -> (# State# s, A# a #)
+freeze# = Exts.freezeArray#

@@ -1,6 +1,6 @@
 {-# language MagicHash #-}
 
-module Vector.Bit
+module Vector.Unlifted
   ( -- Types
     Vector(..)
   , Vector#
@@ -17,16 +17,12 @@ module Vector.Bit
   , substitute
   , initialized
   , unsafeCoerceLength
-  , expose
-  , expose#
     -- * Ranges
   , set
   , setSlice
     -- * Freeze
   , unsafeShrinkFreeze
   , unsafeFreeze
-  , freeze
-  , freezeSlice
     -- * Copy
   , thaw
     -- * Composite
@@ -44,11 +40,8 @@ module Vector.Bit
   , index1
   , index2
   , index3
-    -- * Equality
-  , equals
   ) where
 
 import Prelude ()
 
-import Vector.Std.Word1
-import Vector.Eq.Word1 (equals)
+import Vector.Std.Unlifted

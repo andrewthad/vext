@@ -33,7 +33,7 @@ module OrdVector
 import Prelude hiding (Bounded,max,min,maximum)
 
 import Rep (R,eq,max)
-import Vector (MutableVector(MutableVector),MutableVector#,Vector,Bounded(Bounded),index,write,write#,thaw,read#,unsafeShrinkFreeze,unsafeFreeze)
+import Vector (MutableVector(MutableVector),MutableVector#,Vector,Bounded(Bounded),index,write,write#,thaw,read#,unsafeShrinkFreeze,unsafeFreeze,thawSlice)
 import GHC.ST (ST(ST),runST)
 import Arithmetic.Types (type (<),Fin(Fin),Nat#)
 import Arithmetic.Types (type (:=:),type (<=))
@@ -138,7 +138,7 @@ bubbleSortSlice ::
   -> Nat# n
   -> Vector n a
 bubbleSortSlice p v i0 n = runST $ do
-  tgt <- thaw p v i0 n
+  tgt <- thawSlice p v i0 n
   bubbleSortSliceInPlace (Lte.reflexive# (# #)) tgt (Nat.zero# (# #)) n
   unsafeFreeze tgt
 
@@ -187,7 +187,7 @@ unique n !v = case Nat.one <? Nat.lift n of
   -- reallocated.
   Nothing -> Bounded n (Lte.reflexive# (# #)) (Vector.unlift v)
   Just oneLt -> runST $ do
-    dst <- thaw (Lte.reflexive# (# #)) v (Nat.zero# (# #)) n
+    dst <- thaw n v
     go dst
        (Nat.unlift (Nat.constant @1))
        (Nat.unlift (Nat.constant @1))

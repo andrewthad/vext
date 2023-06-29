@@ -33,6 +33,7 @@ module Element
   , set#
   , unsafeShrinkFreeze#
   , thaw#
+  , freeze#
   ) where
 
 import Rep (R)
@@ -140,3 +141,13 @@ set# (M# dstA dstB) off0 len0 e s0 = case unsafeToTuple e of
 
 empty# :: forall (a :: TYPE R). (# #) -> A# a
 empty# _ = A# (A.empty# (# #)) (B.empty# (# #))
+
+freeze# :: forall (s :: Type) (a :: TYPE R).
+     M# s a
+  -> Int#
+  -> Int#
+  -> State# s
+  -> (# State# s, A# a #)
+freeze# (M# a b) off len s0 = case A.freeze# a off len s0 of
+  (# s1, a' #) -> case B.freeze# b off len s1 of
+    (# s2, b' #) -> (# s2, A# a' b' #)

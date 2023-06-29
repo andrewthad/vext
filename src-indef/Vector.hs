@@ -37,13 +37,19 @@ module Vector
   , C.empty
   , C.unsafeCoerceLength
   , C.unsafeCoerceVector
+  , C.expose
+  , C.expose#
+  , C.freezeSlice
     -- * Ranges
-  , C.set
+  , set
+  , C.setSlice
     -- * Freeze
   , C.unsafeShrinkFreeze
   , C.unsafeFreeze
+  , freeze
     -- * Copy
-  , C.thaw
+  , thaw
+  , C.thawSlice
     -- * Composite
   , map
   , ifoldl'
@@ -135,13 +141,36 @@ mapSlice p f v off0 n = runST action where
   -- TODO: We should use Fin.ascendFromM_# to avoid unneeded additions.
   action :: forall s. ST s (Vector n a)
   action = do
-    dst <- C.thaw p v off0 n
+    dst <- C.thawSlice p v off0 n
     Fin.ascendM_# n $ \fin -> do
       let callback :: forall (j :: GHC.Nat). (j < n) -> Nat# j -> ST s ()
           callback lt ix = case C.index v (Fin.construct# (Lt.unlift (Lt.decrementR @n (Lt.substituteL (Equal.symmetric (Plus.associative @j @i @n)) (Lt.substituteR (Plus.commutative @n @m) (Lt.plus lt (Lte.lift p)))))) (Nat.plus# ix off0)) of
             a0 -> C.write dst fin (f a0)
       Fin.with# fin callback
     C.unsafeFreeze dst
+
+freeze :: 
+     Nat# n -- ^ Mutable vector length
+  -> MutableVector s n a -- ^ Mutable vector
+  -> ST s (Vector n a)
+{-# inline freeze #-}
+freeze n mv = C.freezeSlice (Lte.reflexive# (# #)) mv (Nat.zero# (# #)) n
+
+thaw :: 
+     Nat# n -- ^ Vector length
+  -> Vector n a -- ^ Mutable vector
+  -> ST s (MutableVector s n a)
+{-# inline thaw #-}
+thaw n mv = C.thawSlice (Lte.reflexive# (# #)) mv (Nat.zero# (# #)) n
+
+-- | Set all elements in the mutable vector to the same value.
+set :: 
+     MutableVector s n a -- ^ Mutable vector
+  -> Nat# n -- ^ Vector length
+  -> a -- ^ Value
+  -> ST s ()
+{-# inline set #-}
+set mv n a = C.setSlice (Lte.reflexive# (# #)) mv (Nat.zero# (# #)) n a
 
 -- | Map over a vector starting at offset 0.
 map :: 
@@ -200,16 +229,17 @@ append n m vn vm = case Nat.testZero# n of
       dst <- C.initialized (Nat.plus# n m) (C.index vn (Fin.construct# zlt (Nat.zero# (# #))))
       C.unsafeFreeze dst
 
+-- TODO: Add a new primitive to Element for this instead.
 cloneSlice :: 
      (i + n <=# m)
   -> Vector m a
   -> Nat# i
   -> Nat# n
   -> Vector n a
-cloneSlice lte v off len = runST (C.thaw lte v off len >>= C.unsafeFreeze)
+cloneSlice lte v off len = runST (C.thawSlice lte v off len >>= C.unsafeFreeze)
 
 clone :: 
      Nat# n
   -> Vector n a
   -> Vector n a
-clone len v = runST (C.thaw (Lte.reflexive# (# #)) v (Nat.zero# (# #)) len >>= C.unsafeFreeze)
+clone len v = runST (C.thawSlice (Lte.reflexive# (# #)) v (Nat.zero# (# #)) len >>= C.unsafeFreeze)

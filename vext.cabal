@@ -175,22 +175,22 @@ library pair-indef
   default-language: Haskell2010
   ghc-options: -O2 -Wall
 
-library triple-indef
-  exposed-modules:
-    Element
-    Rep
-  signatures:
-    ElementA
-    ElementB
-    ElementC
-    RepA
-    RepB
-    RepC
-  build-depends:
-    , base >=4.12.0.0 && <5
-  hs-source-dirs: src-triple-indef
-  default-language: Haskell2010
-  ghc-options: -O2 -Wall
+-- library triple-indef
+--   exposed-modules:
+--     Element
+--     Rep
+--   signatures:
+--     ElementA
+--     ElementB
+--     ElementC
+--     RepA
+--     RepB
+--     RepC
+--   build-depends:
+--     , base >=4.12.0.0 && <5
+--   hs-source-dirs: src-triple-indef
+--   default-language: Haskell2010
+--   ghc-options: -O2 -Wall
 
 
 library pair-array-inst
@@ -241,6 +241,7 @@ library
   exposed-modules:
     Vector.Bit
     Vector.Int32
+    Vector.Unlifted
   build-depends:
     , base >=4.12.0.0 && <5 
     , vext:inst

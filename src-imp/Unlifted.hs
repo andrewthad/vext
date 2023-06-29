@@ -25,6 +25,7 @@ module Unlifted
   , unsafeShrinkFreeze#
   , thaw#
   , initialized#
+  , freeze#
   ) where
 
 import GHC.Exts
@@ -112,3 +113,11 @@ thaw# :: forall (s :: Type) (a :: TYPE R).
   -> State# s
   -> (# State# s, M# s a #)
 thaw# = Exts.thawArray#
+
+freeze# :: forall (s :: Type) (a :: TYPE R).
+     M# s a
+  -> Int#
+  -> Int#
+  -> State# s
+  -> (# State# s, A# a #)
+freeze# = Exts.freezeArray#

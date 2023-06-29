@@ -66,3 +66,10 @@ read# :: forall (s :: Type) (a :: TYPE R).
   -> (# State# s, a #)
 
 empty# :: forall (a :: TYPE R). (# #) -> A# a
+
+freeze# :: forall (s :: Type) (a :: TYPE R).
+     M# s a
+  -> Int# -- offset
+  -> Int# -- length
+  -> State# s
+  -> (# State# s, A# a #)

@@ -13,17 +13,18 @@
 {-# LANGUAGE MagicHash #-}
 {-# LANGUAGE UnboxedTuples #-}
 
+import Arithmetic.Types (Nat#)
+import Control.Monad.ST (runST)
 import Data.Bytes (Bytes)
 import Data.Functor.Classes (liftShowsPrec)
 import Data.Maybe (isJust)
 import Data.Proxy (Proxy(Proxy))
+import Data.Unlifted (Bool#,pattern True#,pattern False#)
 import Data.Word (Word8,Word64)
+import GHC.Exts (Int32#)
+import GHC.Int (Int32(I32#))
 import Test.Tasty (defaultMain,testGroup,TestTree)
 import Test.Tasty.QuickCheck ((===),counterexample)
-import GHC.Int (Int32(I32#))
-import Arithmetic.Types (Nat#)
-import GHC.Exts (Int32#)
-import Data.Unlifted (Bool#,pattern True#,pattern False#)
 
 import qualified Data.Bytes as Bytes
 import qualified Data.List as List
@@ -53,6 +54,10 @@ tests = testGroup "tests"
               (unliftBool $ c == b)
               (unliftBool $ d == b)
          in Bit.equals (Nat.constant# @4 (# #)) v0 v1
+    , TQC.testProperty "freeze" $ \(I32# a# ) (I32# b# ) (I32# c# ) (I32# d# ) ->
+        let v0 = Int32.construct4 a# b# c# d#
+            v1 = runST (Int32.freeze Nat.N4# =<< Int32.thaw Nat.N4# v0)
+         in Int32.equals Nat.N4# v0 v1
     , TQC.testProperty "bubble-sort-min" $ \a@(I32# a# ) b@(I32# b# ) c@(I32# c# ) d@(I32# d# ) ->
         let v = Int32.bubbleSort (Nat.constant# @4 (# #)) (Int32.construct4 a# b# c# d#)
             v0 = Int32.index0 v

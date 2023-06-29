@@ -28,6 +28,7 @@ module Int32
   , gt#
   , eq#
   , max
+  , freeze#
   ) where
 
 import Prelude hiding (max)
@@ -156,3 +157,14 @@ thaw# :: forall (s :: Type) (a :: TYPE R).
 thaw# (PrimArray# v) off len s0 = case Exts.newByteArray# (len *# 4# ) s0 of
   (# s1, m #) -> case Exts.copyByteArray# v (off *# 4# ) m 0# (len *# 4# ) s1 of
     s2 -> (# s2, MutablePrimArray# m #)
+
+freeze# :: forall (s :: Type) (a :: TYPE R).
+     M# s a
+  -> Int#
+  -> Int#
+  -> State# s
+  -> (# State# s, A# a #)
+freeze# (MutablePrimArray# v) off len s0 = case Exts.newByteArray# (len *# 4# ) s0 of
+  (# s1, m #) -> case Exts.copyMutableByteArray# v (off *# 4# ) m 0# (len *# 4# ) s1 of
+    s2 -> case Exts.unsafeFreezeByteArray# m s2 of
+      (# s3, x #) -> (# s3, PrimArray# x #)

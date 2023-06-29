@@ -17,11 +17,16 @@ module Vector.Int32
   , substitute
   , initialized
   , unsafeCoerceLength
+  , expose
+  , expose#
     -- * Ranges
   , set
+  , setSlice
     -- * Freeze
   , unsafeShrinkFreeze
   , unsafeFreeze
+  , freeze
+  , freezeSlice
     -- * Copy
   , thaw
     -- * Composite
