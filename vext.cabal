@@ -26,6 +26,23 @@ library indef
   default-language: Haskell2010
   ghc-options: -O2 -Wall
 
+library map-indef
+  exposed-modules:
+    MapVector
+  build-depends:
+    , base >=4.12.0.0 && <5
+    , natural-arithmetic
+    , unlifted
+    , vext:indef
+  mixins:
+    vext:indef (Vector as VectorA) requires
+      (Element as ElementA, Rep as RepA),
+    vext:indef (Vector as VectorB) requires
+      (Element as ElementB, Rep as RepB),
+  hs-source-dirs: src-map-indef
+  default-language: Haskell2010
+  ghc-options: -O2 -Wall
+
 library type-eq-indef
   exposed-modules:
     TypeEqVector
@@ -142,9 +159,11 @@ library inst
     , Vector.Std.Int32
     , Vector.Ord.Int32
     , Vector.Std.Unlifted
+    , Vector.Map.Unlifted.Int32
   build-depends:
     , vext:imp
     , vext:indef
+    , vext:map-indef
     , vext:ord-indef
     , vext:type-eq-indef
     , primitive >=0.7
@@ -154,6 +173,8 @@ library inst
     vext:indef (Vector as Vector.Std.Word32) requires (Element as Word32, Rep as Word32),
     vext:indef (Vector as Vector.Std.Word64) requires (Element as Word64, Rep as Word64),
     vext:indef (Vector as Vector.Std.Int32) requires (Element as Int32, Rep as Int32),
+    vext:map-indef (MapVector as Vector.Map.Unlifted.Int32) requires
+      (ElementA as Unlifted, RepA as Unlifted, ElementB as Int32, RepB as Int32),
     vext:indef (Vector as Vector.Std.Lifted) requires (Element as Lifted, Rep as Lifted),
     vext:indef (Vector as Vector.Std.Unlifted) requires (Element as Unlifted, Rep as Unlifted),
     vext:type-eq-indef (TypeEqVector as Vector.Std.Unlifted.Eq.ShortText)
@@ -242,11 +263,17 @@ library
     Vector.Bit
     Vector.Int32
     Vector.Unlifted
+    Vector.Unlifted.ByteArray
+    Vector.Unlifted.ShortText
   build-depends:
     , base >=4.12.0.0 && <5 
     , vext:inst
     , vext:pair-inst
     , vext:inst-bit
+    , natural-arithmetic
+    , primitive >=0.8
+    , run-st >=0.1.3
+    , unlifted
 
 test-suite test 
   default-language: Haskell2010

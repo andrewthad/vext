@@ -52,6 +52,9 @@ module Vector
   , C.thawSlice
     -- * Composite
   , map
+  , all
+  , traverse_
+  , foldlM
   , ifoldl'
   , ifoldlSlice'
   , replicate
@@ -67,7 +70,7 @@ module Vector
   , index3
   ) where
 
-import Prelude hiding (read,map,Bounded,replicate)
+import Prelude hiding (read,map,Bounded,replicate,all)
 
 import Core (Vector(..),Vector#,MutableVector(..),unsafeFreeze,index,write)
 import Data.Unlifted (Maybe#(..))
@@ -122,11 +125,34 @@ ifoldlSlice' p f b0 v off0 n =
 ifoldl' :: forall (n :: GHC.Nat) (a :: TYPE R) (b :: Type).
      (b -> Fin# n -> a -> b)
   -> b
-  -> Vector n a
   -> Nat# n
+  -> Vector n a
   -> b
 {-# inline ifoldl' #-}
-ifoldl' f b0 v n = ifoldlSlice' (Lte.reflexive @n) f b0 v (Nat.zero# (# #)) n
+ifoldl' f b0 n v = ifoldlSlice' (Lte.reflexive @n) f b0 v (Nat.zero# (# #)) n
+
+traverse_ :: forall (n :: GHC.Nat) (m :: Type -> Type) (a :: TYPE R) (b :: Type).
+     Monad m
+  => (a -> m b)
+  -> Nat# n
+  -> Vector n a
+  -> m ()
+{-# inline traverse_ #-}
+traverse_ f n v = Fin.ascendM_# n
+  (\fin -> f (index v fin)
+  )
+
+foldlM :: forall (n :: GHC.Nat) (m :: Type -> Type) (a :: TYPE R) (b :: Type).
+     Monad m
+  => (b -> a -> m b)
+  -> b
+  -> Nat# n
+  -> Vector n a
+  -> m b
+{-# inline foldlM #-}
+foldlM f b0 n v = Fin.ascendM# n b0
+  (\fin acc -> f acc (index v fin)
+  )
 
 -- | Map over a slice of a vector.
 mapSlice :: forall (i :: GHC.Nat) (m :: GHC.Nat) (n :: GHC.Nat) (a :: TYPE R).
@@ -180,6 +206,10 @@ map ::
   -> Vector n a
 {-# inline map #-}
 map f v n = mapSlice (Lte.reflexive# (# #)) f v (Nat.zero# (# #)) n
+
+all :: (a -> Bool) -> Nat# n -> Vector n a -> Bool
+{-# inline all #-}
+all g n v = Fin.descend# n True (\fin acc -> g (index v fin) && acc)
 
 unlift :: Vector n a -> Vector# n a
 unlift (Vector x) = x

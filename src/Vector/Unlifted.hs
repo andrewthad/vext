@@ -23,10 +23,14 @@ module Vector.Unlifted
     -- * Freeze
   , unsafeShrinkFreeze
   , unsafeFreeze
+  , freeze
+  , freezeSlice
     -- * Copy
   , thaw
     -- * Composite
   , map
+  , traverse_
+  , foldlM
   , ifoldl'
   , ifoldlSlice'
   , replicate
@@ -40,6 +44,8 @@ module Vector.Unlifted
   , index1
   , index2
   , index3
+    -- * Unsafe
+  , unsafeCoerceVector
   ) where
 
 import Prelude ()
