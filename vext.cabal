@@ -8,7 +8,6 @@ author: Andrew Martin
 maintainer: andrew.thaddeus@gmail.com
 copyright: 2019 Andrew Martin
 category: Data
-extra-source-files: CHANGELOG.md
 
 library indef
   exposed-modules:
