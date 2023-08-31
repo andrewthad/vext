@@ -1,4 +1,5 @@
 {-# language BangPatterns #-}
+{-# language PatternSynonyms #-}
 {-# language BlockArguments #-}
 {-# language DataKinds #-}
 {-# language ExplicitNamespaces #-}
@@ -24,6 +25,8 @@ module Vector
   , C.MutableVector(..)
   , C.MutableVector#
   , Bounded(..)
+  , Vector_(..)
+  , vector_
     -- * Primitives
   , C.write#
   , C.write
@@ -37,6 +40,7 @@ module Vector
   , C.empty
   , C.unsafeCoerceLength
   , C.unsafeCoerceVector
+  , unsafeConstruct#
   , C.expose
   , C.expose#
   , C.freezeSlice
@@ -85,6 +89,7 @@ import Arithmetic.Types (type (<),Fin(Fin),Nat#)
 import Arithmetic.Types (type (:=:),type (<=))
 import Arithmetic.Types (type (<=#))
 import GHC.TypeNats (type (+),CmpNat)
+import Data.Either.Void (pattern LeftVoid#,pattern RightVoid#)
 
 import qualified Element as A
 import qualified Arithmetic.Equal as Equal
@@ -105,6 +110,13 @@ data Bounded :: GHC.Nat -> TYPE R -> Type where
     -> (m <=# n)
     -> (Vector# m a)
     -> Bounded n a
+
+-- | A vector in which the length is hidden.
+data Vector_ :: TYPE R -> Type where
+  Vector_ :: forall (a :: TYPE R) (n :: GHC.Nat).
+       (Nat# n)
+    -> (Vector# n a)
+    -> Vector_ a
 
 ifoldlSlice' :: forall (i :: GHC.Nat) (m :: GHC.Nat) (n :: GHC.Nat) (a :: TYPE R) (b :: Type).
      (i + n <= m)
@@ -252,10 +264,10 @@ index3 !src = C.index src
 append :: forall n m (a :: TYPE R).
   Nat# n -> Nat# m -> Vector n a -> Vector m a -> Vector (n + m) a
 append n m vn vm = case Nat.testZero# n of
-  (# zeq | #) -> C.substitute (Equal.plusR# @m zeq) vm
-  (# | zlt #) -> case Nat.testZero# m of
-    (# zeq | #) -> C.substitute (Equal.plusL# @n zeq) vn
-    (# | _ #) -> runST $ do
+  LeftVoid# zeq -> C.substitute (Equal.plusR# @m zeq) vm
+  RightVoid# zlt -> case Nat.testZero# m of
+    LeftVoid# zeq -> C.substitute (Equal.plusL# @n zeq) vn
+    _ -> runST $ do
       dst <- C.initialized (Nat.plus# n m) (C.index vn (Fin.construct# zlt (Nat.zero# (# #))))
       C.unsafeFreeze dst
 
@@ -273,3 +285,16 @@ clone ::
   -> Vector n a
   -> Vector n a
 clone len v = runST (C.thawSlice (Lte.reflexive# (# #)) v (Nat.zero# (# #)) len >>= C.unsafeFreeze)
+
+-- | This is extremely unsafe. It allows us to create a vector and
+-- invent the length. Users are not supposed to use this. It exists
+-- so that we can build @with@ functions for arrays that support
+-- recovering the length from an array. (All array types except bit
+-- vectors support this.)
+unsafeConstruct# :: A# a -> Vector# n a
+{-# inline unsafeConstruct# #-}
+unsafeConstruct# = C.Vector#
+
+vector_ :: Nat# n -> Vector n a -> Vector_ a
+{-# inline vector_ #-}
+vector_ n (Vector x) = Vector_ n x

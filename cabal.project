@@ -1,2 +1,2 @@
 with-compiler: ghc-9.4.5
-packages: . ../unlifted ../natural-arithmetic
+packages: . ../natural-arithmetic

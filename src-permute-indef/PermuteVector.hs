@@ -5,12 +5,13 @@
 {-# language GADTs #-}
 {-# language KindSignatures #-}
 {-# language MagicHash #-}
-{-# language UnliftedNewtypes #-}
+{-# language PatternSynonyms #-}
 {-# language RankNTypes #-}
 {-# language ScopedTypeVariables #-}
 {-# language TypeApplications #-}
 {-# language TypeOperators #-}
 {-# language UnboxedTuples #-}
+{-# language UnliftedNewtypes #-}
 
 module PermuteVector
   ( permute
@@ -27,6 +28,7 @@ import Arithmetic.Types (type (<#),type (<=#))
 import Arithmetic.Nat ((<?),(<?#))
 import GHC.TypeNats (type (+))
 import GHC.Exts (TYPE,State#)
+import Data.Either.Void (pattern LeftVoid#, pattern RightVoid#)
 
 import qualified GHC.TypeNats as GHC
 import qualified Element
@@ -47,8 +49,8 @@ permute :: forall (m :: GHC.Nat) (n :: GHC.Nat) (a :: TYPE R).
   -> V.Vector m a -- ^ output
 {-# noinline permute #-}
 permute m !ixs !v = case Nat.testZero# m of
-  (# zeq | #) -> V.substitute zeq (V.empty (# #))
-  (# | zlt #) -> runST $ do
+  LeftVoid# zeq -> V.substitute zeq (V.empty (# #))
+  RightVoid# zlt -> runST $ do
     -- More clean presentation of initialization:  
     -- dst := initialize(v[ixs[0]]])
     dst <- V.initialized m (V.index v (weaken (FV.index ixs (Fin.construct# zlt (Nat.zero# (# #))))))

@@ -12,12 +12,14 @@
 {-# language TypeApplications #-}
 {-# language TypeOperators #-}
 {-# language UnboxedTuples #-}
+{-# language UnboxedSums #-}
 
 -- Turn this on when debugging performance.
 -- OPTIONS_GHC -ddump-simpl -ddump-to-file -dsuppress-all -ddump-cmm -ddump-asm
 
 module EqVector
   ( equals
+  , findIndexEq
   ) where
 
 import Prelude hiding (Bounded,max,min,maximum)
@@ -32,6 +34,8 @@ import Arithmetic.Nat ((<?),(<?#))
 import GHC.TypeNats (type (+))
 import GHC.Exts (TYPE,State#)
 import Data.Unlifted (Bool#,pattern True#,pattern False#)
+import Arithmetic.Types (MaybeFin#,pattern MaybeFinNothing#,pattern MaybeFinJust#)
+import Data.Maybe.Void (pattern JustVoid#)
 
 import qualified GHC.TypeNats as GHC
 import qualified Element
@@ -48,3 +52,15 @@ equals !n !v0 !v1 = Fin.descend (Nat.lift n) True $ \fin acc ->
   eq (index v0 (Fin.unlift fin)) (index v1 (Fin.unlift fin))
   &&
   acc
+
+findIndexEq :: forall (n :: GHC.Nat) (a :: TYPE R). Nat# n -> a -> Vector n a -> MaybeFin# n
+findIndexEq !n !needle !v = go Nat.N0#
+  where
+  go :: Nat# k -> MaybeFin# n
+  go !ix = case ix <?# n of
+    JustVoid# lt ->
+      let !fin = Fin.construct# lt ix
+       in if eq (V.index v fin) needle
+            then MaybeFinJust# fin
+            else go (Nat.succ# ix)
+    _ -> MaybeFinNothing#

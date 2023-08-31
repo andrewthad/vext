@@ -32,6 +32,7 @@ module OrdVector
 
 import Prelude hiding (Bounded,max,min,maximum)
 
+import EqVector (equals)
 import Rep (R,eq,max)
 import Vector (MutableVector(MutableVector),MutableVector#,Vector,Bounded(Bounded),index,write,write#,thaw,read#,unsafeShrinkFreeze,unsafeFreeze,thawSlice)
 import GHC.ST (ST(ST),runST)
@@ -42,6 +43,7 @@ import Arithmetic.Nat ((<?),(<?#))
 import GHC.TypeNats (type (+))
 import GHC.Exts (TYPE,State#)
 import Data.Unlifted (Bool#,pattern True#,pattern False#)
+import Data.Maybe.Void (pattern JustVoid#)
 
 import qualified GHC.TypeNats as GHC
 import qualified Element
@@ -72,14 +74,14 @@ mapEq n e v = runST $ do
     else pure ()
   BV.unsafeFreeze dst
 
--- | Compare two vectors for equality.
---
--- TODO: reexport this instead
-equals :: Nat# n -> Vector n a -> Vector n a -> Bool
-equals !n !v0 !v1 = Fin.descend (Nat.lift n) True $ \fin acc ->
-  eq (index v0 (Fin.unlift fin)) (index v1 (Fin.unlift fin))
-  &&
-  acc
+-- x -- | Compare two vectors for equality.
+-- x --
+-- x -- TODO: reexport this instead
+-- x equals :: Nat# n -> Vector n a -> Vector n a -> Bool
+-- x equals !n !v0 !v1 = Fin.descend (Nat.lift n) True $ \fin acc ->
+-- x   eq (index v0 (Fin.unlift fin)) (index v1 (Fin.unlift fin))
+-- x   &&
+-- x   acc
 
 maximum :: forall (n :: GHC.Nat) (a :: TYPE R).
      Nat# n
@@ -160,7 +162,7 @@ bubbleSortSliceInPlace lte0 (MutableVector tgt) i0 n =
     _ ->
       let inner :: Nat# j -> State# s -> State# s
           inner j si0 = case Nat.succ# j <?# end of
-            (# | jsuccltm #) ->
+            JustVoid# jsuccltm ->
               let k0 = Fin.construct# (Lt.transitiveNonstrictR# (Lt.weakenLhsR# @1 jsuccltm) lte0) j
                   k1 = Fin.construct# (Lt.transitiveNonstrictR# jsuccltm lte0) (Nat.succ# j)
                in case read# tgt k0 si0 of
@@ -170,7 +172,7 @@ bubbleSortSliceInPlace lte0 (MutableVector tgt) i0 n =
                         _ -> case write# tgt k1 e0 si2 of
                           si3 -> case write# tgt k0 e1 si3 of
                             si4 -> inner (Nat.succ# j) si4
-            (# _ | #) -> outer (countdown - 1) si0
+            _ -> outer (countdown - 1) si0
        in inner i0 so0
 
 -- | Collapse adjacent equal elements into a single element. For example:
@@ -201,10 +203,7 @@ unique n !v = case Nat.one <? Nat.lift n of
      -> Nat# ixS -> Nat# ixD -> (ixS <=# n) -> (ixD <=# ixS) -> a
      -> ST s (Bounded n a)
   go !dst ixSrc ixDst slte lte prev = case ixSrc <?# n of
-    (# _ | #) -> do
-      out <- unsafeShrinkFreeze (Lte.transitive# lte slte) dst ixDst
-      pure (Bounded ixDst (Lte.transitive# lte slte) (Vector.unlift out))
-    (# | lt #) -> case index v (Fin.construct# lt ixSrc) of
+    JustVoid# lt -> case index v (Fin.construct# lt ixSrc) of
       x -> if eq prev x
         then go
           dst
@@ -216,3 +215,6 @@ unique n !v = case Nat.one <? Nat.lift n of
         else do
           write dst (Fin.construct# (Lt.transitiveNonstrictL# lte lt) ixDst) x
           go dst (Nat.succ# ixSrc) (Nat.succ# ixDst) (Lte.fromStrictSucc# lt) (Lte.incrementR# @1 lte) x
+    _ -> do
+      out <- unsafeShrinkFreeze (Lte.transitive# lte slte) dst ixDst
+      pure (Bounded ixDst (Lte.transitive# lte slte) (Vector.unlift out))

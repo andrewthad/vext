@@ -86,6 +86,7 @@ library ord-indef
     , unlifted
     , vext:indef
     , vext:inst-bit
+    , vext:rep-eq-indef
   hs-source-dirs: src-ord-indef
   default-language: Haskell2010
   ghc-options: -O2 -Wall
@@ -102,6 +103,7 @@ library permute-indef
   build-depends:
     , base >=4.12.0.0 && <5
     , natural-arithmetic
+    , unlifted
     , vext:indef
     , vext:inst
   mixins:
@@ -120,7 +122,10 @@ library imp
     Word16
     Word32
     Word64
+    Int
+    Int16
     Int32
+    Int64
     Lifted
     Unlifted
     ShortText
@@ -156,15 +161,25 @@ library inst
     , Vector.Std.Word16
     , Vector.Std.Word32
     , Vector.Std.Word64
+    , Vector.Std.Int16
     , Vector.Std.Int32
+    , Vector.Std.Int
+    , Vector.Ord.Int16
     , Vector.Ord.Int32
+    , Vector.Eq.Int16
+    , Vector.Eq.Int32
+    , Vector.Std.Int64
+    , Vector.Ord.Int64
     , Vector.Std.Unlifted
     , Vector.Map.Unlifted.Int32
+    , Vector.Map.Lifted.Int32
+    , Vector.Map.Lifted.Lifted
   build-depends:
     , vext:imp
     , vext:indef
     , vext:map-indef
     , vext:ord-indef
+    , vext:rep-eq-indef
     , vext:type-eq-indef
     , primitive >=0.7
   mixins:
@@ -173,13 +188,24 @@ library inst
     vext:indef (Vector as Vector.Std.Word32) requires (Element as Word32, Rep as Word32),
     vext:indef (Vector as Vector.Std.Word64) requires (Element as Word64, Rep as Word64),
     vext:indef (Vector as Vector.Std.Int32) requires (Element as Int32, Rep as Int32),
+    vext:indef (Vector as Vector.Std.Int16) requires (Element as Int16, Rep as Int16),
+    vext:indef (Vector as Vector.Std.Int) requires (Element as Int, Rep as Int),
+    vext:indef (Vector as Vector.Std.Int64) requires (Element as Int64, Rep as Int64),
     vext:map-indef (MapVector as Vector.Map.Unlifted.Int32) requires
       (ElementA as Unlifted, RepA as Unlifted, ElementB as Int32, RepB as Int32),
+    vext:map-indef (MapVector as Vector.Map.Lifted.Int32) requires
+      (ElementA as Lifted, RepA as Lifted, ElementB as Int32, RepB as Int32),
+    vext:map-indef (MapVector as Vector.Map.Lifted.Lifted) requires
+      (ElementA as Lifted, RepA as Lifted, ElementB as Lifted, RepB as Lifted),
     vext:indef (Vector as Vector.Std.Lifted) requires (Element as Lifted, Rep as Lifted),
     vext:indef (Vector as Vector.Std.Unlifted) requires (Element as Unlifted, Rep as Unlifted),
     vext:type-eq-indef (TypeEqVector as Vector.Std.Unlifted.Eq.ShortText)
       requires (Element as Unlifted, Rep as Unlifted, Type as ShortText),
+    vext:ord-indef (OrdVector as Vector.Ord.Int16) requires (Element as Int16, Rep as Int16),
     vext:ord-indef (OrdVector as Vector.Ord.Int32) requires (Element as Int32, Rep as Int32),
+    vext:ord-indef (OrdVector as Vector.Ord.Int64) requires (Element as Int64, Rep as Int64),
+    vext:rep-eq-indef (EqVector as Vector.Eq.Int32) requires (Element as Int32, Rep as Int32),
+    vext:rep-eq-indef (EqVector as Vector.Eq.Int16) requires (Element as Int16, Rep as Int16),
 
 library pair-indef
   exposed-modules:
@@ -259,9 +285,15 @@ library
     , Vector.Std.Word16
     , Vector.Std.Word32
     , Vector.Std.Word8
+    , Vector.Map.Lifted.Int32
+    , Vector.Map.Lifted.Lifted
   exposed-modules:
     Vector.Bit
+    Vector.Int
+    Vector.Int16
     Vector.Int32
+    Vector.Int64
+    Vector.Lifted
     Vector.Unlifted
     Vector.Unlifted.ByteArray
     Vector.Unlifted.ShortText

@@ -1,5 +1,6 @@
 {-# language BangPatterns #-}
 {-# language BlockArguments #-}
+{-# language PatternSynonyms #-}
 {-# language DataKinds #-}
 {-# language ExplicitNamespaces #-}
 {-# language GADTs #-}
@@ -20,6 +21,7 @@ module MapVector
 import Prelude hiding (map)
 import Arithmetic.Types (Nat#)
 import Control.Monad.ST (runST)
+import Data.Either.Void (pattern LeftVoid#,pattern RightVoid#)
 
 import qualified VectorA as A
 import qualified VectorB as B
@@ -29,8 +31,8 @@ import qualified Arithmetic.Nat as Nat
 map :: (a -> b) -> Nat# n -> A.Vector n a -> B.Vector n b
 {-# inline map #-}
 map f n !v = case Nat.testZero# n of
-  (# zeq | #) -> B.substitute zeq (B.empty (# #))
-  (# | zlt #) -> runST $ do
+  LeftVoid# zeq -> B.substitute zeq (B.empty (# #))
+  RightVoid# zlt -> runST $ do
     dst <- B.initialized n (f (A.index v (Fin.construct# zlt Nat.N0#)))
     Fin.ascendM_# n
       (\fin -> do

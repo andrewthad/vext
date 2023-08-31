@@ -12,6 +12,7 @@ module Vector.Int32
   , MutableVector(..)
   , MutableVector#
   , Bounded(..)
+  , Vector_(..)
     -- * Primitives
   , write#
   , write
@@ -52,6 +53,7 @@ module Vector.Int32
     -- * Ordered
   , unique
   , equals
+  , findIndexEq
   , maximum
   , maximumSlice
   , maximumSliceInitial
@@ -68,6 +70,7 @@ import Prelude hiding (replicate,map,maximum,Bounded,all)
 
 import Vector.Std.Int32
 import Vector.Ord.Int32
+import Vector.Eq.Int32
 
 import Control.Monad.ST (runST)
 import GHC.Exts (Int32#)
@@ -105,6 +108,6 @@ toFins ::
   -> Nat# n -- ^ vector length
   -> Vector n Int32#
   -> Maybe (Vector n (Fin32# m))
-toFins m n !v = if all (\v# -> let v = I32# v# in v >= 0 && fromIntegral @Int32 @Int v < I# (Nat.demote# m)) n v
+toFins m n !v = if all (\v# -> let w = I32# v# in w >= 0 && fromIntegral @Int32 @Int w < I# (Nat.demote# m)) n v
   then Just (unsafeCoerceVector v)
   else Nothing
