@@ -288,6 +288,7 @@ library
     , Vector.Map.Lifted.Lifted
   exposed-modules:
     Vector.Bit
+    Vector.Word32
     Vector.Int
     Vector.Int16
     Vector.Int32
