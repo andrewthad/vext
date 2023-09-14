@@ -20,6 +20,7 @@ module Word8
   , unsafeShrinkFreeze#
   , thaw#
   , freeze#
+  , copy#
   ) where
 
 import GHC.Exts
@@ -114,3 +115,14 @@ freeze# (MutablePrimArray# v) off len s0 = case Exts.newByteArray# len s0 of
   (# s1, m #) -> case Exts.copyMutableByteArray# v off m 0# len s1 of
     s2 -> case Exts.unsafeFreezeByteArray# m s2 of
       (# s3, x #) -> (# s3, PrimArray# x #)
+
+copy# :: forall (s :: Type) (a :: TYPE R).
+     M# s a
+  -> Int#
+  -> A# a
+  -> Int#
+  -> Int#
+  -> State# s
+  -> State# s
+copy# (MutablePrimArray# m) doff (PrimArray# v) soff len s0 =
+  Exts.copyByteArray# v soff m doff len s0

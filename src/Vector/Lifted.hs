@@ -1,3 +1,4 @@
+{-# language BangPatterns #-}
 {-# language MagicHash #-}
 {-# language RankNTypes #-}
 
@@ -50,6 +51,7 @@ module Vector.Lifted
   , unsafeCoerceVector
     -- * Interop with primitive
   , with
+  , toSmallArray
     -- * Hide Length
   , vector_
   ) where
@@ -66,5 +68,10 @@ with ::
      SmallArray a
   -> (forall n. Nat# n -> Vector n a -> b)
   -> b
+{-# inline with #-}
 with (SmallArray xs) f =
   f (Nat# (Exts.sizeofSmallArray# xs)) (Vector (unsafeConstruct# xs))
+
+toSmallArray :: Vector n a -> SmallArray a
+{-# inline toSmallArray #-}
+toSmallArray !v = SmallArray (expose v)

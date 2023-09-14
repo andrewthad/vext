@@ -69,6 +69,15 @@ set# :: forall (s :: Type) (a :: TYPE R).
   -> State# s
   -> State# s
 
+copy# :: forall (s :: Type) (a :: TYPE R).
+     M# s a
+  -> Int#
+  -> A# a
+  -> Int#
+  -> Int#
+  -> State# s
+  -> State# s
+
 thaw# :: forall (s :: Type) (a :: TYPE R).
      A# a
   -> Int#

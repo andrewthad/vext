@@ -43,6 +43,7 @@ module Word1
   , unsafeShrinkFreeze#
   , thaw#
   , freeze#
+  , copy#
   ) where
 
 import GHC.Exts

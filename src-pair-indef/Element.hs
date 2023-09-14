@@ -34,6 +34,7 @@ module Element
   , unsafeShrinkFreeze#
   , thaw#
   , freeze#
+  , copy#
   ) where
 
 import Rep (R)
@@ -151,3 +152,15 @@ freeze# :: forall (s :: Type) (a :: TYPE R).
 freeze# (M# a b) off len s0 = case A.freeze# a off len s0 of
   (# s1, a' #) -> case B.freeze# b off len s1 of
     (# s2, b' #) -> (# s2, A# a' b' #)
+
+copy# :: forall (s :: Type) (a :: TYPE R).
+     M# s a
+  -> Int#
+  -> A# a
+  -> Int#
+  -> Int#
+  -> State# s
+  -> State# s
+copy# (M# dstA dstB) doff (A# srcA srcB) soff len s0 =
+  case A.copy# dstA doff (unsafeCoerce# srcA) soff len s0 of
+    s1 -> B.copy# dstB doff (unsafeCoerce# srcB) soff len s1

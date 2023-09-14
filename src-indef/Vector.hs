@@ -62,6 +62,7 @@ module Vector
   , ifoldl'
   , ifoldlSlice'
   , replicate
+  , construct1
   , construct3
   , construct4
   , append
@@ -85,7 +86,7 @@ import GHC.ST (ST,runST)
 import Data.Kind (Type)
 import GHC.Exts (TYPE,State#,Int#,(*#))
 import Arithmetic.Unsafe (Fin#(Fin#))
-import Arithmetic.Types (type (<),Fin(Fin),Nat#)
+import Arithmetic.Types (type (<),type (<#),Fin(Fin),Nat#)
 import Arithmetic.Types (type (:=:),type (<=))
 import Arithmetic.Types (type (<=#))
 import GHC.TypeNats (type (+),CmpNat)
@@ -129,8 +130,8 @@ ifoldlSlice' :: forall (i :: GHC.Nat) (m :: GHC.Nat) (n :: GHC.Nat) (a :: TYPE R
 {-# inline ifoldlSlice' #-}
 ifoldlSlice' p f b0 v off0 n =
   Fin.ascendFrom'# off0 n b0 $ \fin b ->
-    let callback :: forall (j :: GHC.Nat). (j < i + n) -> Nat# j -> b
-        callback lt ix = case C.index v (Fin.construct# (Lt.unlift (Lt.transitiveNonstrictR lt p)) ix) of
+    let callback :: forall (j :: GHC.Nat). (j <# i + n) -> Nat# j -> b
+        callback lt ix = case C.index v (Fin.construct# (Lt.unlift (Lt.transitiveNonstrictR (Lt.lift lt) p)) ix) of
           a0 -> f b fin a0
      in Fin.with# fin callback
 
@@ -181,8 +182,8 @@ mapSlice p f v off0 n = runST action where
   action = do
     dst <- C.thawSlice p v off0 n
     Fin.ascendM_# n $ \fin -> do
-      let callback :: forall (j :: GHC.Nat). (j < n) -> Nat# j -> ST s ()
-          callback lt ix = case C.index v (Fin.construct# (Lt.unlift (Lt.decrementR @n (Lt.substituteL (Equal.symmetric (Plus.associative @j @i @n)) (Lt.substituteR (Plus.commutative @n @m) (Lt.plus lt (Lte.lift p)))))) (Nat.plus# ix off0)) of
+      let callback :: forall (j :: GHC.Nat). (j <# n) -> Nat# j -> ST s ()
+          callback lt ix = case C.index v (Fin.construct# (Lt.unlift (Lt.decrementR @n (Lt.substituteL (Equal.symmetric (Plus.associative @j @i @n)) (Lt.substituteR (Plus.commutative @n @m) (Lt.plus (Lt.lift lt) (Lte.lift p)))))) (Nat.plus# ix off0)) of
             a0 -> C.write dst fin (f a0)
       Fin.with# fin callback
     C.unsafeFreeze dst
@@ -241,6 +242,11 @@ construct3 x0 x1 x2 = runST $ do
   C.write dst (Fin.construct# (Lt.constant# (# #)) (Nat.constant# @2 (# #))) x2
   C.unsafeFreeze dst
 
+construct1 :: a -> Vector 1 a
+construct1 x0 = runST $ do
+  dst <- C.initialized (Nat.constant# @1 (# #)) x0
+  C.unsafeFreeze dst
+
 replicate :: Nat# n -> a -> Vector n a
 replicate n a = runST (C.unsafeFreeze =<< C.initialized n a)
 
@@ -269,6 +275,8 @@ append n m vn vm = case Nat.testZero# n of
     LeftVoid# zeq -> C.substitute (Equal.plusL# @n zeq) vn
     _ -> runST $ do
       dst <- C.initialized (Nat.plus# n m) (C.index vn (Fin.construct# zlt (Nat.zero# (# #))))
+      C.copySlice (Lte.weakenR# @m (Lte.reflexive# @n (# #))) (Lte.reflexive# (# #)) dst Nat.N0# vn Nat.N0# n
+      C.copySlice (Lte.reflexive# @(n + m) (# #)) (Lte.reflexive# @m (# #)) dst n vm Nat.N0# m
       C.unsafeFreeze dst
 
 -- TODO: Add a new primitive to Element for this instead.

@@ -52,6 +52,7 @@ module Core
   , empty#
   , empty
   , unsafeShrinkFreeze
+  , copySlice
   , setSlice
   , freezeSlice
   , unsafeFreeze
@@ -59,6 +60,7 @@ module Core
   , thawSlice
   , unsafeCoerceLength
   , unsafeCoerceVector
+  , unsafeCoerceVector#
   , substitute
   , expose
   , expose#
@@ -187,6 +189,19 @@ unsafeFreeze# (MutableVector# m) s0 =
   case A.unsafeFreeze# m s0 of
     (# s1, y #) -> (# s1, Vector# y #)
 
+copySlice ::
+     (di + n <=# dn)
+  -> (si + n <=# sn)
+  -> MutableVector s dn a
+  -> Nat# di
+  -> Vector sn a
+  -> Nat# si
+  -> Nat# n
+  -> ST s ()
+{-# inline copySlice #-}
+copySlice _ _ (MutableVector (MutableVector# dst)) (Nat# di) (Vector (Vector# src)) (Nat# si) (Nat# len) = ST $ \s0 ->
+  (# A.copy# dst di src si len s0, () #)
+
 thawSlice ::
      (i + n <=# m)
   -> Vector m a
@@ -220,6 +235,10 @@ unsafeCoerceLength !_ (Vector (Vector# x)) = Vector (Vector# x)
 unsafeCoerceVector :: forall (a :: TYPE R) (b :: TYPE R) (n :: GHC.Nat). Vector n a -> Vector n b
 {-# inline unsafeCoerceVector #-}
 unsafeCoerceVector (Vector (Vector# x)) = Vector (Vector# (unsafeCoerce# x :: A# b))
+
+unsafeCoerceVector# :: forall (a :: TYPE R) (b :: TYPE R) (n :: GHC.Nat). Vector# n a -> Vector# n b
+{-# inline unsafeCoerceVector# #-}
+unsafeCoerceVector# (Vector# x) = Vector# (unsafeCoerce# x :: A# b)
 
 expose :: Vector n a -> A# a
 {-# inline expose #-}

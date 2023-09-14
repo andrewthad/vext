@@ -73,3 +73,12 @@ freeze# :: forall (s :: Type) (a :: TYPE R).
   -> Int# -- length
   -> State# s
   -> (# State# s, A# a #)
+
+copy# :: forall (s :: Type) (a :: TYPE R).
+     M# s a
+  -> Int#
+  -> A# a
+  -> Int#
+  -> Int#
+  -> State# s
+  -> State# s

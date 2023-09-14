@@ -26,6 +26,7 @@ module Unlifted
   , thaw#
   , initialized#
   , freeze#
+  , copy#
   ) where
 
 import GHC.Exts
@@ -121,3 +122,14 @@ freeze# :: forall (s :: Type) (a :: TYPE R).
   -> State# s
   -> (# State# s, A# a #)
 freeze# = Exts.freezeArray#
+
+copy# :: forall (s :: Type) (a :: TYPE R).
+     M# s a
+  -> Int#
+  -> A# a
+  -> Int#
+  -> Int#
+  -> State# s
+  -> State# s
+copy# m doff v soff len s0 =
+  Exts.copyArray# v soff m doff len s0

@@ -21,6 +21,7 @@ module Int16
   , unsafeShrinkFreeze#
   , thaw#
   , freeze#
+  , copy#
     -- Comparison
   , lt
   , gt
@@ -138,6 +139,17 @@ freeze# (MutablePrimArray# v) off len s0 = case Exts.newByteArray# (len *# 2# ) 
   (# s1, m #) -> case Exts.copyMutableByteArray# v (off *# 2# ) m 0# (len *# 2# ) s1 of
     s2 -> case Exts.unsafeFreezeByteArray# m s2 of
       (# s3, x #) -> (# s3, PrimArray# x #)
+
+copy# :: forall (s :: Type) (a :: TYPE R).
+     M# s a
+  -> Int#
+  -> A# a
+  -> Int#
+  -> Int#
+  -> State# s
+  -> State# s
+copy# (MutablePrimArray# m) doff (PrimArray# v) soff len s0 =
+  Exts.copyByteArray# v (2# *# soff) m (2# *# doff) (2# *# len) s0
 
 max :: forall (a :: TYPE R). a -> a -> a
 {-# inline max #-}
