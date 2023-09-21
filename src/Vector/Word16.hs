@@ -44,6 +44,8 @@ module Vector.Word16
   , construct3
   , construct4
   , construct5
+  , construct6
+  , construct7
   , append
   , clone
   , cloneSlice

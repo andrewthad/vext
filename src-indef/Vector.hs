@@ -66,6 +66,8 @@ module Vector
   , construct3
   , construct4
   , construct5
+  , construct6
+  , construct7
   , append
   , clone
   , cloneSlice
@@ -237,6 +239,27 @@ construct5 x0 x1 x2 x3 x4 = runST $ do
   C.write dst (Fin.construct# (Lt.constant# (# #)) (Nat.constant# @2 (# #))) x2
   C.write dst (Fin.construct# (Lt.constant# (# #)) (Nat.constant# @3 (# #))) x3
   C.write dst (Fin.construct# (Lt.constant# (# #)) (Nat.constant# @4 (# #))) x4
+  C.unsafeFreeze dst
+
+construct6 :: a -> a -> a -> a -> a -> a -> Vector 6 a
+construct6 x0 x1 x2 x3 x4 x5 = runST $ do
+  dst <- C.initialized (Nat.constant# @6 (# #)) x0
+  C.write dst (Fin.construct# (Lt.constant# (# #)) (Nat.constant# @1 (# #))) x1
+  C.write dst (Fin.construct# (Lt.constant# (# #)) (Nat.constant# @2 (# #))) x2
+  C.write dst (Fin.construct# (Lt.constant# (# #)) (Nat.constant# @3 (# #))) x3
+  C.write dst (Fin.construct# (Lt.constant# (# #)) (Nat.constant# @4 (# #))) x4
+  C.write dst (Fin.construct# (Lt.constant# (# #)) (Nat.constant# @5 (# #))) x5
+  C.unsafeFreeze dst
+
+construct7 :: a -> a -> a -> a -> a -> a -> a -> Vector 7 a
+construct7 x0 x1 x2 x3 x4 x5 x6 = runST $ do
+  dst <- C.initialized (Nat.constant# @7 (# #)) x0
+  C.write dst (Fin.construct# (Lt.constant# (# #)) (Nat.constant# @1 (# #))) x1
+  C.write dst (Fin.construct# (Lt.constant# (# #)) (Nat.constant# @2 (# #))) x2
+  C.write dst (Fin.construct# (Lt.constant# (# #)) (Nat.constant# @3 (# #))) x3
+  C.write dst (Fin.construct# (Lt.constant# (# #)) (Nat.constant# @4 (# #))) x4
+  C.write dst (Fin.construct# (Lt.constant# (# #)) (Nat.constant# @5 (# #))) x5
+  C.write dst (Fin.construct# (Lt.constant# (# #)) (Nat.constant# @6 (# #))) x6
   C.unsafeFreeze dst
 
 construct4 :: a -> a -> a -> a -> Vector 4 a
