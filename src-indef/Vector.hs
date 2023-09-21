@@ -65,6 +65,7 @@ module Vector
   , construct1
   , construct3
   , construct4
+  , construct5
   , append
   , clone
   , cloneSlice
@@ -226,6 +227,15 @@ all g n v = Fin.descend# n True (\fin acc -> g (index v fin) && acc)
 
 unlift :: Vector n a -> Vector# n a
 unlift (Vector x) = x
+
+construct5 :: a -> a -> a -> a -> a -> Vector 5 a
+construct5 x0 x1 x2 x3 x4 = runST $ do
+  dst <- C.initialized (Nat.constant# @5 (# #)) x0
+  C.write dst (Fin.construct# (Lt.constant# (# #)) (Nat.constant# @1 (# #))) x1
+  C.write dst (Fin.construct# (Lt.constant# (# #)) (Nat.constant# @2 (# #))) x2
+  C.write dst (Fin.construct# (Lt.constant# (# #)) (Nat.constant# @3 (# #))) x3
+  C.write dst (Fin.construct# (Lt.constant# (# #)) (Nat.constant# @4 (# #))) x4
+  C.unsafeFreeze dst
 
 construct4 :: a -> a -> a -> a -> Vector 4 a
 construct4 x0 x1 x2 x3 = runST $ do
