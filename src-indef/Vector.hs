@@ -57,6 +57,7 @@ module Vector
     -- * Composite
   , map
   , all
+  , any
   , traverse_
   , foldlM
   , ifoldl'
@@ -80,7 +81,7 @@ module Vector
   , index5
   ) where
 
-import Prelude hiding (read,map,Bounded,replicate,all)
+import Prelude hiding (read,map,Bounded,replicate,all,any)
 
 import Core (Vector(..),Vector#,MutableVector(..),unsafeFreeze,index,write)
 import Data.Unlifted (Maybe#(..))
@@ -228,6 +229,10 @@ map f v n = mapSlice (Lte.reflexive# (# #)) f v (Nat.zero# (# #)) n
 all :: (a -> Bool) -> Nat# n -> Vector n a -> Bool
 {-# inline all #-}
 all g n v = Fin.descend# n True (\fin acc -> g (index v fin) && acc)
+
+any :: (a -> Bool) -> Nat# n -> Vector n a -> Bool
+{-# inline any #-}
+any g n v = Fin.descend# n False (\fin acc -> g (index v fin) || acc)
 
 unlift :: Vector n a -> Vector# n a
 unlift (Vector x) = x

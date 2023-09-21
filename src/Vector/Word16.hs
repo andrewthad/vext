@@ -36,6 +36,8 @@ module Vector.Word16
     -- * Copy
   , thaw
     -- * Composite
+  , any
+  , all
   , map
   , ifoldl'
   , ifoldlSlice'
@@ -69,7 +71,7 @@ module Vector.Word16
   , vector_
   ) where
 
-import Prelude hiding (replicate,map,maximum,Bounded,all)
+import Prelude hiding (replicate,map,maximum,Bounded,all,any)
 
 import Vector.Std.Word16
 import Vector.Ord.Word16

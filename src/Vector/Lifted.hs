@@ -31,6 +31,8 @@ module Vector.Lifted
     -- * Copy
   , thaw
     -- * Composite
+  , any
+  , all
   , map
   , traverse_
   , foldlM
