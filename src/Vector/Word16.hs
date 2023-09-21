@@ -59,6 +59,7 @@ module Vector.Word16
     -- * Ordered
   , unique
   , equals
+  , elem
   , findIndexEq
   , maximum
   , maximumSlice
@@ -71,7 +72,7 @@ module Vector.Word16
   , vector_
   ) where
 
-import Prelude hiding (replicate,map,maximum,Bounded,all,any)
+import Prelude hiding (replicate,map,maximum,Bounded,all,any,elem)
 
 import Vector.Std.Word16
 import Vector.Ord.Word16

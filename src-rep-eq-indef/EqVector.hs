@@ -19,10 +19,11 @@
 
 module EqVector
   ( equals
+  , elem
   , findIndexEq
   ) where
 
-import Prelude hiding (Bounded,max,min,maximum)
+import Prelude hiding (Bounded,max,min,maximum,elem)
 
 import Rep (R,eq)
 import Vector (MutableVector(MutableVector),MutableVector#,Vector,Bounded(Bounded),index,write,write#,thaw,read#,unsafeShrinkFreeze,unsafeFreeze)
@@ -52,6 +53,18 @@ equals !n !v0 !v1 = Fin.descend (Nat.lift n) True $ \fin acc ->
   eq (index v0 (Fin.unlift fin)) (index v1 (Fin.unlift fin))
   &&
   acc
+
+elem :: forall (n :: GHC.Nat) (a :: TYPE R). Nat# n -> a -> Vector n a -> Bool
+elem !n !needle !v = go Nat.N0#
+  where
+  go :: Nat# k -> Bool
+  go !ix = case ix <?# n of
+    JustVoid# lt ->
+      let !fin = Fin.construct# lt ix
+       in if eq (V.index v fin) needle
+            then True
+            else go (Nat.succ# ix)
+    _ -> False
 
 findIndexEq :: forall (n :: GHC.Nat) (a :: TYPE R). Nat# n -> a -> Vector n a -> MaybeFin# n
 findIndexEq !n !needle !v = go Nat.N0#
