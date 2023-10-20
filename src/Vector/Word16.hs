@@ -56,6 +56,11 @@ module Vector.Word16
   , index1
   , index2
   , index3
+  , index4
+  , index5
+  , index6
+  , index7
+  , index8
     -- * Ordered
   , unique
   , equals

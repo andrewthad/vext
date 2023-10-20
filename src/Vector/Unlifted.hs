@@ -46,6 +46,11 @@ module Vector.Unlifted
   , index1
   , index2
   , index3
+  , index4
+  , index5
+  , index6
+  , index7
+  , index8
     -- * Unsafe
   , unsafeCoerceVector
   ) where

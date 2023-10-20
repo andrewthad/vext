@@ -53,6 +53,9 @@ module Vector.Lifted
   , index3
   , index4
   , index5
+  , index6
+  , index7
+  , index8
     -- * Unsafe
   , unsafeCoerceVector
     -- * Interop with primitive

@@ -79,6 +79,9 @@ module Vector
   , index3
   , index4
   , index5
+  , index6
+  , index7
+  , index8
   ) where
 
 import Prelude hiding (read,map,Bounded,replicate,all,any)
@@ -313,6 +316,18 @@ index4 !src = C.index src
 index5 :: forall n (a :: TYPE R). (CmpNat 5 n ~ 'LT) => Vector n a -> a
 index5 !src = C.index src
   (Fin.construct# (Lt.constant# (# #)) (Nat.constant# @5 (# #)) :: Fin# n)
+
+index6 :: forall n (a :: TYPE R). (CmpNat 6 n ~ 'LT) => Vector n a -> a
+index6 !src = C.index src
+  (Fin.construct# (Lt.constant# (# #)) (Nat.constant# @6 (# #)) :: Fin# n)
+
+index7 :: forall n (a :: TYPE R). (CmpNat 7 n ~ 'LT) => Vector n a -> a
+index7 !src = C.index src
+  (Fin.construct# (Lt.constant# (# #)) (Nat.constant# @7 (# #)) :: Fin# n)
+
+index8 :: forall n (a :: TYPE R). (CmpNat 8 n ~ 'LT) => Vector n a -> a
+index8 !src = C.index src
+  (Fin.construct# (Lt.constant# (# #)) (Nat.constant# @8 (# #)) :: Fin# n)
 
 -- TODO: Finish writing this. We need to call copy after initializing.
 append :: forall n m (a :: TYPE R).
