@@ -55,20 +55,35 @@ module Vector
   , thaw
   , C.thawSlice
     -- * Composite
+  , empty_
   , map
   , all
   , any
   , traverse_
+  , itraverse_
   , foldlM
+  , foldrZip
+  , foldr
   , ifoldl'
   , ifoldlSlice'
   , replicate
   , construct1
+  , construct2
   , construct3
   , construct4
   , construct5
   , construct6
   , construct7
+  , construct1#
+  , construct2#
+  , construct3#
+  , construct4#
+  , construct7#
+  , construct1_
+  , construct2_
+  , construct3_
+  , construct4_
+  , construct7_
   , append
   , clone
   , cloneSlice
@@ -84,7 +99,7 @@ module Vector
   , index8
   ) where
 
-import Prelude hiding (read,map,Bounded,replicate,all,any)
+import Prelude hiding (read,map,Bounded,replicate,all,any,foldr)
 
 import Core (Vector(..),Vector#,MutableVector(..),unsafeFreeze,index,write)
 import Data.Unlifted (Maybe#(..))
@@ -96,16 +111,15 @@ import Data.Kind (Type)
 import GHC.Exts (TYPE,State#,Int#,(*#))
 import Arithmetic.Unsafe (Fin#(Fin#))
 import Arithmetic.Types (type (<),type (<#),Fin(Fin),Nat#)
-import Arithmetic.Types (type (:=:),type (<=))
+import Arithmetic.Types (type (<=))
 import Arithmetic.Types (type (<=#))
+import Arithmetic.Nat (pattern N0#, pattern N1#, pattern N2#, pattern N3#, pattern N4#, pattern N7#)
 import GHC.TypeNats (type (+),CmpNat)
 import Data.Either.Void (pattern LeftVoid#,pattern RightVoid#)
 
-import qualified Element as A
 import qualified Arithmetic.Equal as Equal
 import qualified Arithmetic.Fin as Fin
 import qualified Arithmetic.Plus as Plus
-import qualified Arithmetic.Types as Arithmetic
 import qualified Arithmetic.Lt as Lt
 import qualified Arithmetic.Lte as Lte
 import qualified Arithmetic.Nat as Nat
@@ -153,6 +167,15 @@ ifoldl' :: forall (n :: GHC.Nat) (a :: TYPE R) (b :: Type).
 {-# inline ifoldl' #-}
 ifoldl' f b0 n v = ifoldlSlice' (Lte.reflexive @n) f b0 v (Nat.zero# (# #)) n
 
+foldr :: forall (n :: GHC.Nat) (a :: TYPE R) (b :: Type).
+     (a -> b -> b)
+  -> b
+  -> Nat# n
+  -> Vector n a
+  -> b
+{-# inline foldr #-}
+foldr f b0 n v = Fin.descend# n b0 (\fin b -> f (index v fin) b)
+
 traverse_ :: forall (n :: GHC.Nat) (m :: Type -> Type) (a :: TYPE R) (b :: Type).
      Monad m
   => (a -> m b)
@@ -163,6 +186,27 @@ traverse_ :: forall (n :: GHC.Nat) (m :: Type -> Type) (a :: TYPE R) (b :: Type)
 traverse_ f n v = Fin.ascendM_# n
   (\fin -> f (index v fin)
   )
+
+itraverse_ :: forall (n :: GHC.Nat) (m :: Type -> Type) (a :: TYPE R) (b :: Type).
+     Monad m
+  => (Fin# n -> a -> m b)
+  -> Nat# n
+  -> Vector n a
+  -> m ()
+{-# inline itraverse_ #-}
+itraverse_ f n v = Fin.ascendM_# n
+  (\fin -> f fin (index v fin)
+  )
+
+foldrZip :: forall (n :: GHC.Nat) (a :: TYPE R) (b :: TYPE R) (c :: Type).
+     (a -> b -> c -> c)
+  -> c
+  -> Nat# n
+  -> Vector n a
+  -> Vector n b
+  -> c
+{-# inline foldrZip #-}
+foldrZip f c0 n v1 v2 = Fin.descend# n c0 (\fin c -> f (index v1 fin) (index v2 fin) c)
 
 foldlM :: forall (n :: GHC.Nat) (m :: Type -> Type) (a :: TYPE R) (b :: Type).
      Monad m
@@ -278,12 +322,48 @@ construct4 x0 x1 x2 x3 = runST $ do
   C.write dst (Fin.construct# (Lt.constant# (# #)) (Nat.constant# @3 (# #))) x3
   C.unsafeFreeze dst
 
+construct2 :: a -> a -> Vector 2 a
+construct2 x0 x1 = runST $ do
+  dst <- C.initialized (Nat.constant# @2 (# #)) x0
+  C.write dst (Fin.construct# (Lt.constant# (# #)) (Nat.constant# @1 (# #))) x1
+  C.unsafeFreeze dst
+
 construct3 :: a -> a -> a -> Vector 3 a
 construct3 x0 x1 x2 = runST $ do
   dst <- C.initialized (Nat.constant# @3 (# #)) x0
   C.write dst (Fin.construct# (Lt.constant# (# #)) (Nat.constant# @1 (# #))) x1
   C.write dst (Fin.construct# (Lt.constant# (# #)) (Nat.constant# @2 (# #))) x2
   C.unsafeFreeze dst
+
+construct1_ :: a -> Vector_ a
+construct1_ x0 = Vector_ N1# (construct1# x0)
+
+construct2_ :: a -> a -> Vector_ a
+construct2_ x0 x1 = Vector_ N2# (construct2# x0 x1)
+
+construct3_ :: a -> a -> a -> Vector_ a
+construct3_ x0 x1 x2 = Vector_ N3# (construct3# x0 x1 x2)
+
+construct4_ :: a -> a -> a -> a -> Vector_ a
+construct4_ x0 x1 x2 x3 = Vector_ N4# (construct4# x0 x1 x2 x3)
+
+construct7_ :: a -> a -> a -> a -> a -> a -> a -> Vector_ a
+construct7_ x0 x1 x2 x3 x4 x5 x6 = Vector_ N7# (construct7# x0 x1 x2 x3 x4 x5 x6)
+
+construct1# :: a -> Vector# 1 a
+construct1# x0 = unlift (construct1 x0)
+
+construct2# :: a -> a -> Vector# 2 a
+construct2# x0 x1 = unlift (construct2 x0 x1)
+
+construct3# :: a -> a -> a -> Vector# 3 a
+construct3# x0 x1 x2 = unlift (construct3 x0 x1 x2)
+
+construct4# :: a -> a -> a -> a -> Vector# 4 a
+construct4# x0 x1 x2 x3 = unlift (construct4 x0 x1 x2 x3)
+
+construct7# :: a -> a -> a -> a -> a -> a -> a -> Vector# 7 a
+construct7# x0 x1 x2 x3 x4 x5 x6 = unlift (construct7 x0 x1 x2 x3 x4 x5 x6)
 
 construct1 :: a -> Vector 1 a
 construct1 x0 = runST $ do
@@ -369,3 +449,6 @@ unsafeConstruct# = C.Vector#
 vector_ :: Nat# n -> Vector n a -> Vector_ a
 {-# inline vector_ #-}
 vector_ n (Vector x) = Vector_ n x
+
+empty_ :: Vector_ a
+empty_ = Vector_ Nat.N0# (C.empty# (# #))

@@ -33,7 +33,7 @@ import qualified Arithmetic.Nat as Nat
 zip :: (a -> b -> c) -> Nat# n -> A.Vector n a -> B.Vector n b -> C.Vector n c
 {-# inline zip #-}
 zip f n !va !vb = case Nat.testZero# n of
-  LeftVoid# zeq -> C.substitute zeq (C.empty (# #))
+  LeftVoid# zeq -> C.substitute zeq C.empty
   RightVoid# zlt -> runST $ do
     dst <- C.initialized n (f (A.index va (Fin.construct# zlt Nat.N0#)) (B.index vb (Fin.construct# zlt Nat.N0#)))
     Fin.ascendM_# n
@@ -45,7 +45,7 @@ zip f n !va !vb = case Nat.testZero# n of
 unzip :: (a -> (# b, c #)) -> Nat# n -> A.Vector n a -> (# B.Vector n b, C.Vector n c #)
 {-# inline unzip #-}
 unzip f n !va = case Nat.testZero# n of
-  LeftVoid# zeq -> (# B.substitute zeq (B.empty (# #)), C.substitute zeq (C.empty (# #)) #)
+  LeftVoid# zeq -> (# B.substitute zeq B.empty, C.substitute zeq C.empty #)
   RightVoid# zlt ->
     let (x,y) = runST $ case f (A.index va (Fin.construct# zlt Nat.N0#)) of
           (# b0, c0 #) -> do

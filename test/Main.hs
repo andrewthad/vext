@@ -117,7 +117,7 @@ tests = testGroup "tests"
   ]
 
 showI32Vector :: Nat# n -> Int32.Vector n Int32# -> String
-showI32Vector n v = Int32.ifoldl' (\acc _ w -> acc ++ ", " ++ show (I32# w))  "" v n
+showI32Vector n v = Int32.ifoldl' (\acc _ w -> acc ++ ", " ++ show (I32# w)) "" n v
 
 unliftBool :: Bool -> Bool#
 unliftBool = \case

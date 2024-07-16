@@ -31,7 +31,7 @@ import qualified Arithmetic.Nat as Nat
 map :: (a -> b) -> Nat# n -> A.Vector n a -> B.Vector n b
 {-# inline map #-}
 map f n !v = case Nat.testZero# n of
-  LeftVoid# zeq -> B.substitute zeq (B.empty (# #))
+  LeftVoid# zeq -> B.substitute zeq B.empty
   RightVoid# zlt -> runST $ do
     dst <- B.initialized n (f (A.index v (Fin.construct# zlt Nat.N0#)))
     Fin.ascendM_# n

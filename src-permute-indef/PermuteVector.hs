@@ -49,7 +49,7 @@ permute :: forall (m :: GHC.Nat) (n :: GHC.Nat) (a :: TYPE R).
   -> V.Vector m a -- ^ output
 {-# noinline permute #-}
 permute m !ixs !v = case Nat.testZero# m of
-  LeftVoid# zeq -> V.substitute zeq (V.empty (# #))
+  LeftVoid# zeq -> V.substitute zeq V.empty
   RightVoid# zlt -> runST $ do
     -- More clean presentation of initialization:  
     -- dst := initialize(v[ixs[0]]])

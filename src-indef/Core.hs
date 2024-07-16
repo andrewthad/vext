@@ -139,8 +139,8 @@ read# (MutableVector# x) (Fin# i) s = A.read# x i s
 empty# :: forall (a :: TYPE R). (# #) -> Vector# 0 a
 empty# _ = Vector# (A.empty# (# #))
 
-empty :: forall (a :: TYPE R). (# #) -> Vector 0 a
-empty _ = Vector (Vector# (A.empty# (# #)))
+empty :: forall (a :: TYPE R). Vector 0 a
+empty = Vector (Vector# (A.empty# (# #)))
 
 initialized :: forall (s :: Type) (n :: GHC.Nat) (a :: TYPE R).
      Nat# n
