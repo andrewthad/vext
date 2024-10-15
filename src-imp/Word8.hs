@@ -21,7 +21,17 @@ module Word8
   , thaw#
   , freeze#
   , copy#
+    -- Comparison
+  , lt
+  , gt
+  , eq
+  , lt#
+  , gt#
+  , eq#
+  , max
   ) where
+
+import Prelude hiding (max)
 
 import GHC.Exts
 import Data.Kind (Type)
@@ -126,3 +136,31 @@ copy# :: forall (s :: Type) (a :: TYPE R).
   -> State# s
 copy# (MutablePrimArray# m) doff (PrimArray# v) soff len s0 =
   Exts.copyByteArray# v soff m doff len s0
+
+max :: forall (a :: TYPE R). a -> a -> a
+{-# inline max #-}
+max x y = if gt x y then x else y
+
+lt :: forall (a :: TYPE R). a -> a -> Bool
+{-# inline lt #-}
+lt x y = isTrue# (ltWord8# (unsafeToW8 x) (unsafeToW8 y))
+
+gt :: forall (a :: TYPE R). a -> a -> Bool
+{-# inline gt #-}
+gt x y = isTrue# (gtWord8# (unsafeToW8 x) (unsafeToW8 y))
+
+eq :: forall (a :: TYPE R). a -> a -> Bool
+{-# inline eq #-}
+eq x y = isTrue# (eqWord8# (unsafeToW8 x) (unsafeToW8 y))
+
+lt# :: forall (a :: TYPE R). a -> a -> Int#
+{-# inline lt# #-}
+lt# x y = ltWord8# (unsafeToW8 x) (unsafeToW8 y)
+
+gt# :: forall (a :: TYPE R). a -> a -> Int#
+{-# inline gt# #-}
+gt# x y = gtWord8# (unsafeToW8 x) (unsafeToW8 y)
+
+eq# :: forall (a :: TYPE R). a -> a -> Int#
+{-# inline eq# #-}
+eq# x y = eqWord8# (unsafeToW8 x) (unsafeToW8 y)

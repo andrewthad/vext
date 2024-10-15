@@ -35,6 +35,7 @@ module Vector.Lifted
     -- * Composite
   , any
   , all
+  , findIndex
   , map
   , traverse_
   , itraverse_
@@ -43,6 +44,7 @@ module Vector.Lifted
   , ifoldlSlice'
   , foldrZip
   , replicate
+  , empty
   , construct1
   , construct2
   , construct3

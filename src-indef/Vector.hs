@@ -59,8 +59,10 @@ module Vector
   , map
   , all
   , any
+  , findIndex
   , traverse_
   , itraverse_
+  , itraverse_#
   , foldlM
   , foldrZip
   , foldr
@@ -113,9 +115,12 @@ import Arithmetic.Unsafe (Fin#(Fin#))
 import Arithmetic.Types (type (<),type (<#),Fin(Fin),Nat#)
 import Arithmetic.Types (type (<=))
 import Arithmetic.Types (type (<=#))
+import Arithmetic.Nat ((<?#))
 import Arithmetic.Nat (pattern N0#, pattern N1#, pattern N2#, pattern N3#, pattern N4#, pattern N7#)
 import GHC.TypeNats (type (+),CmpNat)
 import Data.Either.Void (pattern LeftVoid#,pattern RightVoid#)
+import Arithmetic.Types (MaybeFin#,pattern MaybeFinNothing#,pattern MaybeFinJust#)
+import Data.Maybe.Void (pattern JustVoid#)
 
 import qualified Arithmetic.Equal as Equal
 import qualified Arithmetic.Fin as Fin
@@ -196,6 +201,17 @@ itraverse_ :: forall (n :: GHC.Nat) (m :: Type -> Type) (a :: TYPE R) (b :: Type
 {-# inline itraverse_ #-}
 itraverse_ f n v = Fin.ascendM_# n
   (\fin -> f fin (index v fin)
+  )
+
+itraverse_# :: forall (n :: GHC.Nat) (m :: Type -> Type) (a :: TYPE R) (b :: Type).
+     Monad m
+  => (Fin# n -> a -> m b)
+  -> Nat# n
+  -> Vector# n a
+  -> m ()
+{-# inline itraverse_# #-}
+itraverse_# f n v = Fin.ascendM_# n
+  (\fin -> f fin (C.index# v fin)
   )
 
 foldrZip :: forall (n :: GHC.Nat) (a :: TYPE R) (b :: TYPE R) (c :: Type).
@@ -452,3 +468,15 @@ vector_ n (Vector x) = Vector_ n x
 
 empty_ :: Vector_ a
 empty_ = Vector_ Nat.N0# (C.empty# (# #))
+
+findIndex :: forall (n :: GHC.Nat) (a :: TYPE R). (a -> Bool) -> Nat# n -> Vector n a -> MaybeFin# n
+findIndex f !n !v = go Nat.N0#
+  where
+  go :: Nat# k -> MaybeFin# n
+  go !ix = case ix <?# n of
+    JustVoid# lt ->
+      let !fin = Fin.construct# lt ix
+       in if f (index v fin)
+            then MaybeFinJust# fin
+            else go (Nat.succ# ix)
+    _ -> MaybeFinNothing#

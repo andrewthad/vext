@@ -36,13 +36,17 @@ module Vector.Int64
   , thaw
     -- * Composite
   , map
+  , foldr
   , ifoldl'
   , ifoldlSlice'
+  , traverse_
+  , itraverse_
   , replicate
   , construct3
   , construct4
   , append
   , clone
+  , cloneSlice
   , cloneSlice
     -- * Index
   , index0
@@ -61,7 +65,7 @@ module Vector.Int64
   , mapEq
   ) where
 
-import Prelude hiding (replicate,map,maximum,Bounded,all)
+import Prelude hiding (replicate,map,maximum,Bounded,all,foldr)
 
 import Vector.Std.Int64
 import Vector.Ord.Int64

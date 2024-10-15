@@ -1,13 +1,18 @@
+{-# language DataKinds #-}
 {-# language MagicHash #-}
+{-# language NumericUnderscores #-}
+{-# language BangPatterns #-}
+{-# language TypeApplications #-}
+{-# language TypeOperators #-}
 
-module Vector.Unlifted
+module Vector.Word8
   ( -- Types
     Vector(..)
   , Vector#
-  , Vector_(..)
   , MutableVector(..)
   , MutableVector#
   , Bounded(..)
+  , Vector_(..)
     -- * Primitives
   , write#
   , write
@@ -18,7 +23,8 @@ module Vector.Unlifted
   , substitute
   , initialized
   , unsafeCoerceLength
-  , empty#
+  , expose
+  , expose#
     -- * Ranges
   , set
   , setSlice
@@ -30,24 +36,18 @@ module Vector.Unlifted
     -- * Copy
   , thaw
     -- * Composite
+  , any
+  , all
   , map
-  , traverse_
-  , itraverse_
-  , itraverse_#
-  , foldlM
-  , foldr
   , ifoldl'
   , ifoldlSlice'
   , replicate
   , construct1
-  , construct2
   , construct3
   , construct4
   , construct5
-  , construct1#
-  , construct2#
-  , construct3#
-  , construct4#
+  , construct6
+  , construct7
   , append
   , clone
   , cloneSlice
@@ -61,10 +61,25 @@ module Vector.Unlifted
   , index6
   , index7
   , index8
-    -- * Unsafe
-  , unsafeCoerceVector
+    -- * Ordered
+  , unique
+  , equals
+  , elem
+  , findIndexEq
+  , maximum
+  , maximumSlice
+  , maximumSliceInitial
+  , bubbleSort
+  , bubbleSortSlice
+  , bubbleSortSliceInPlace
+  , mapEq
+    -- * Hide Length
+  , vector_
   ) where
 
-import Prelude ()
+import Prelude hiding (replicate,map,maximum,Bounded,all,any,elem)
 
-import Vector.Std.Unlifted
+import Vector.Std.Word8
+import Vector.Ord.Word8
+import Vector.Eq.Word8
+

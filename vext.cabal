@@ -109,6 +109,22 @@ library ord-indef
   default-language: Haskell2010
   ghc-options: -O2 -Wall
 
+library mask-indef
+  exposed-modules:
+    MaskVector
+  signatures:
+    Element
+    Rep
+  build-depends:
+    , base >=4.12.0.0 && <5
+    , natural-arithmetic
+    , unlifted
+    , vext:indef
+    , vext:inst-bit
+  hs-source-dirs: src-mask-indef
+  default-language: Haskell2010
+  ghc-options: -O2 -Wall
+
 -- Inherits the element signature
 library permute-indef
   exposed-modules:
@@ -135,18 +151,20 @@ library imp
   other-modules:
     EmptyPrimArray
   exposed-modules:
-    Word1
-    Word8
-    Word16
-    Word32
-    Word64
     Int
     Int16
     Int32
     Int64
     Lifted
-    Unlifted
     ShortText
+    Unlifted
+    Word
+    Word1
+    Word16
+    Word32
+    Word64
+    Word128
+    Word8
   build-depends:
     , base >=4.12.0.0 && <5
     , primitive >=0.7
@@ -175,10 +193,12 @@ library inst
   ghc-options: -O2 -Wall
   reexported-modules:
     , Vector.Std.Lifted
+    , Vector.Std.Word
     , Vector.Std.Word8
     , Vector.Std.Word16
     , Vector.Std.Word32
     , Vector.Std.Word64
+    , Vector.Std.Word128
     , Vector.Std.Int16
     , Vector.Std.Int32
     , Vector.Std.Int
@@ -186,17 +206,25 @@ library inst
     , Vector.Ord.Int
     , Vector.Ord.Int16
     , Vector.Ord.Int32
+    , Vector.Ord.Word8
     , Vector.Ord.Word16
     , Vector.Eq.Int16
+    , Vector.Eq.Word8
     , Vector.Eq.Word16
     , Vector.Eq.Int32
+    , Vector.Masked.Word128
+    , Vector.Masked.Word16
+    , Vector.Masked.Int64
+    , Vector.Masked.Unlifted
     , Vector.Std.Int64
     , Vector.Ord.Int64
     , Vector.Std.Unlifted
     , Vector.Map.Unlifted.Int32
     , Vector.Map.Word16.Lifted
+    , Vector.Map.Unlifted.Lifted
     , Vector.Map.Lifted.Int32
     , Vector.Map.Lifted.Lifted
+    , Vector.Map.Lifted.Unlifted
     , Vector.Zip.Unlifted.Word32.Lifted
     , Vector.Zip.Unlifted.Lifted.Lifted
     , Vector.Zip.Word16.Lifted.Lifted
@@ -210,16 +238,23 @@ library inst
     , vext:ord-indef
     , vext:rep-eq-indef
     , vext:type-eq-indef
+    , vext:mask-indef
     , primitive >=0.7
   mixins:
+    vext:indef (Vector as Vector.Std.Word) requires (Element as Word, Rep as Word),
     vext:indef (Vector as Vector.Std.Word8) requires (Element as Word8, Rep as Word8),
     vext:indef (Vector as Vector.Std.Word16) requires (Element as Word16, Rep as Word16),
     vext:indef (Vector as Vector.Std.Word32) requires (Element as Word32, Rep as Word32),
     vext:indef (Vector as Vector.Std.Word64) requires (Element as Word64, Rep as Word64),
+    vext:indef (Vector as Vector.Std.Word128) requires (Element as Word128, Rep as Word128),
     vext:indef (Vector as Vector.Std.Int32) requires (Element as Int32, Rep as Int32),
     vext:indef (Vector as Vector.Std.Int16) requires (Element as Int16, Rep as Int16),
     vext:indef (Vector as Vector.Std.Int) requires (Element as Int, Rep as Int),
     vext:indef (Vector as Vector.Std.Int64) requires (Element as Int64, Rep as Int64),
+    vext:mask-indef (MaskVector as Vector.Masked.Word128) requires (Element as Word128, Rep as Word128),
+    vext:mask-indef (MaskVector as Vector.Masked.Int64) requires (Element as Int64, Rep as Int64),
+    vext:mask-indef (MaskVector as Vector.Masked.Word16) requires (Element as Word16, Rep as Word16),
+    vext:mask-indef (MaskVector as Vector.Masked.Unlifted) requires (Element as Unlifted, Rep as Unlifted),
     vext:zip-indef (ZipVector as Vector.Zip.Bit.Bit.Bit) requires
       (ElementA as Word1, RepA as Word1, ElementB as Word1, RepB as Word1, ElementC as Word1, RepC as Word1),
     vext:zip-indef (ZipVector as Vector.Zip.Lifted.Word16.Lifted) requires
@@ -236,6 +271,10 @@ library inst
       (ElementA as Lifted, RepA as Lifted, ElementB as Int32, RepB as Int32),
     vext:map-indef (MapVector as Vector.Map.Lifted.Lifted) requires
       (ElementA as Lifted, RepA as Lifted, ElementB as Lifted, RepB as Lifted),
+    vext:map-indef (MapVector as Vector.Map.Lifted.Unlifted) requires
+      (ElementA as Lifted, RepA as Lifted, ElementB as Unlifted, RepB as Unlifted),
+    vext:map-indef (MapVector as Vector.Map.Unlifted.Lifted) requires
+      (ElementA as Unlifted, RepA as Unlifted, ElementB as Lifted, RepB as Lifted),
     vext:map-indef (MapVector as Vector.Map.Word16.Lifted) requires
       (ElementA as Word16, RepA as Word16, ElementB as Lifted, RepB as Lifted),
     vext:indef (Vector as Vector.Std.Lifted) requires (Element as Lifted, Rep as Lifted),
@@ -244,12 +283,14 @@ library inst
       requires (Element as Unlifted, Rep as Unlifted, Type as ShortText),
     vext:ord-indef (OrdVector as Vector.Ord.Int) requires (Element as Int, Rep as Int),
     vext:ord-indef (OrdVector as Vector.Ord.Int16) requires (Element as Int16, Rep as Int16),
+    vext:ord-indef (OrdVector as Vector.Ord.Word8) requires (Element as Word8, Rep as Word8),
     vext:ord-indef (OrdVector as Vector.Ord.Word16) requires (Element as Word16, Rep as Word16),
     vext:ord-indef (OrdVector as Vector.Ord.Int32) requires (Element as Int32, Rep as Int32),
     vext:ord-indef (OrdVector as Vector.Ord.Int64) requires (Element as Int64, Rep as Int64),
     vext:rep-eq-indef (EqVector as Vector.Eq.Int) requires (Element as Int, Rep as Int),
     vext:rep-eq-indef (EqVector as Vector.Eq.Int32) requires (Element as Int32, Rep as Int32),
     vext:rep-eq-indef (EqVector as Vector.Eq.Int16) requires (Element as Int16, Rep as Int16),
+    vext:rep-eq-indef (EqVector as Vector.Eq.Word8) requires (Element as Word8, Rep as Word8),
     vext:rep-eq-indef (EqVector as Vector.Eq.Word16) requires (Element as Word16, Rep as Word16),
 
 library pair-indef
@@ -330,25 +371,35 @@ library
     , Vector.Std.Word16
     , Vector.Std.Word32
     , Vector.Std.Word8
+    , Vector.Std.Word
     , Vector.Map.Lifted.Int32
     , Vector.Map.Lifted.Lifted
+    , Vector.Map.Lifted.Unlifted
     , Vector.Map.Word16.Lifted
+    , Vector.Map.Unlifted.Lifted
     , Vector.Zip.Unlifted.Word32.Lifted
     , Vector.Zip.Unlifted.Lifted.Lifted
     , Vector.Zip.Word16.Lifted.Lifted
     , Vector.Zip.Lifted.Word16.Lifted
   exposed-modules:
     Vector.Bit
+    Vector.Word
+    Vector.Word8
     Vector.Word16
     Vector.Word32
+    Vector.Word128
+    Vector.Word128.Masked
     Vector.Int
     Vector.Int16
     Vector.Int32
     Vector.Int64
+    Vector.Int64.Masked
+    Vector.Word16.Masked
     Vector.Lifted
     Vector.Unlifted
     Vector.Unlifted.ByteArray
     Vector.Unlifted.ShortText
+    Vector.Unlifted.Masked
   build-depends:
     , base >=4.12.0.0 && <5 
     , vext:inst

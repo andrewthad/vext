@@ -1,0 +1,9 @@
+{-# language KindSignatures #-}
+{-# language RankNTypes #-}
+{-# language MagicHash #-}
+
+signature Rep where
+
+import GHC.Exts (TYPE,RuntimeRep,Int#)
+
+data R :: RuntimeRep
