@@ -61,6 +61,7 @@ module Vector
   , any
   , findIndex
   , traverse_
+  , traverseZip_
   , itraverse_
   , itraverse_#
   , foldlM
@@ -190,6 +191,18 @@ traverse_ :: forall (n :: GHC.Nat) (m :: Type -> Type) (a :: TYPE R) (b :: Type)
 {-# inline traverse_ #-}
 traverse_ f n v = Fin.ascendM_# n
   (\fin -> f (index v fin)
+  )
+
+traverseZip_ :: forall (n :: GHC.Nat) (m :: Type -> Type) (a :: TYPE R) (b :: TYPE R) (c :: Type).
+     Monad m
+  => (a -> b -> m c)
+  -> Nat# n
+  -> Vector n a
+  -> Vector n b
+  -> m ()
+{-# inline traverseZip_ #-}
+traverseZip_ f n v w = Fin.ascendM_# n
+  (\fin -> f (index v fin) (index w fin)
   )
 
 itraverse_ :: forall (n :: GHC.Nat) (m :: Type -> Type) (a :: TYPE R) (b :: Type).

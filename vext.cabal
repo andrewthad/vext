@@ -408,6 +408,7 @@ library
     , natural-arithmetic
     , primitive >=0.8
     , run-st >=0.1.3
+    , transformers >=0.6.1
     , unlifted
 
 test-suite test 
