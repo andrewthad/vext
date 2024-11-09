@@ -45,6 +45,7 @@ module Vector.Lifted
   , foldlM
   , ifoldl'
   , ifoldlSlice'
+  , foldr
   , foldrZip
   , replicate
   , empty
@@ -84,7 +85,7 @@ module Vector.Lifted
   , vector_
   ) where
 
-import Prelude hiding (replicate,map,all,any,read,Bounded)
+import Prelude hiding (replicate,map,all,any,read,Bounded,foldr)
 import Vector.Std.Lifted
 
 import Control.Monad.Trans.Class (lift)
