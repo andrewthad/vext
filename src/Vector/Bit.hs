@@ -54,9 +54,10 @@ module Vector.Bit
     -- * Custom
   , zipAnd
   , zipOr
+  , allEqTrue
   ) where
 
-import Prelude hiding (replicate, map, Bounded)
+import Prelude hiding (replicate, map, Bounded, all, foldr)
 import Data.Unlifted (Bool#, pattern True#, pattern False#)
 
 import Vector.Std.Word1
@@ -64,6 +65,9 @@ import Vector.Eq.Word1 (equals)
 import Arithmetic.Types (Nat#)
 
 import qualified Vector.Zip.Bit.Bit.Bit as Zip
+
+allEqTrue :: Nat# n -> Vector n Bool# -> Bool
+allEqTrue n = foldr (\b acc -> case b of {True# -> acc; _ -> False}) True n
 
 zipOr :: 
      Nat# n
