@@ -31,6 +31,8 @@ module Vector.Int
   , thaw
     -- * Composite
   , map
+  , all
+  , any
   , traverse_
   , itraverse_
   , foldlM
