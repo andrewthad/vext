@@ -45,6 +45,7 @@ module Vector.Lifted
   , foldlM
   , ifoldl'
   , ifoldlSlice'
+  , ifoldr
   , foldr
   , foldrZip
   , replicate

@@ -67,6 +67,7 @@ module Vector
   , foldlM
   , foldrZip
   , foldr
+  , ifoldr
   , ifoldl'
   , ifoldlSlice'
   , replicate
@@ -181,6 +182,15 @@ foldr :: forall (n :: GHC.Nat) (a :: TYPE R) (b :: Type).
   -> b
 {-# inline foldr #-}
 foldr f b0 n v = Fin.descend# n b0 (\fin b -> f (index v fin) b)
+
+ifoldr :: forall (n :: GHC.Nat) (a :: TYPE R) (b :: Type).
+     (Fin# n -> a -> b -> b)
+  -> b
+  -> Nat# n
+  -> Vector n a
+  -> b
+{-# inline ifoldr #-}
+ifoldr f b0 n v = Fin.descend# n b0 (\fin b -> f fin (index v fin) b)
 
 traverse_ :: forall (n :: GHC.Nat) (m :: Type -> Type) (a :: TYPE R) (b :: Type).
      Monad m
