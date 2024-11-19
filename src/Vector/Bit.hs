@@ -1,6 +1,7 @@
 {-# language MagicHash #-}
-{-# language PatternSynonyms #-}
 {-# language MultiWayIf #-}
+{-# language PatternSynonyms #-}
+{-# language UnboxedTuples #-}
 
 module Vector.Bit
   ( -- Types
@@ -12,6 +13,7 @@ module Vector.Bit
     -- * Primitives
   , write#
   , write
+  , read
   , read#
   , index#
   , index
@@ -57,14 +59,24 @@ module Vector.Bit
   , allEqTrue
   ) where
 
-import Prelude hiding (replicate, map, Bounded, all, foldr)
+import Prelude hiding (replicate, map, Bounded, all, foldr, read)
 import Data.Unlifted (Bool#, pattern True#, pattern False#)
 
+import GHC.ST (ST(ST))
 import Vector.Std.Word1
 import Vector.Eq.Word1 (equals)
-import Arithmetic.Types (Nat#)
+import Arithmetic.Types (Nat#,Fin#)
 
 import qualified Vector.Zip.Bit.Bit.Bit as Zip
+
+read :: MutableVector s n Bool# -> Fin# n -> ST s Bool
+{-# inline read #-}
+read (MutableVector v) i = ST
+  (\s0 -> case read# v i s0 of
+    (# s1, x #) -> case x of
+      True# -> (# s1, True #)
+      _ -> (# s1, False #)
+  )
 
 allEqTrue :: Nat# n -> Vector n Bool# -> Bool
 allEqTrue n = foldr (\b acc -> case b of {True# -> acc; _ -> False}) True n
