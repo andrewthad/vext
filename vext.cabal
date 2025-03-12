@@ -1,6 +1,6 @@
 cabal-version: 3.4
 name: vext
-version: 0.1.0.0
+version: 0.1.1.0
 synopsis: Array library monomorphized with backpack
 bug-reports: https://github.com/andrewthad/vex-unified/issues
 license: BSD-3-Clause
@@ -388,6 +388,7 @@ library
     Vector.Word8
     Vector.Word16
     Vector.Word32
+    Vector.Word64
     Vector.Word128
     Vector.Word128.Masked
     Vector.Int
