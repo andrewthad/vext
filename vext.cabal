@@ -1,6 +1,6 @@
 cabal-version: 3.4
 name: vext
-version: 0.1.2.0
+version: 0.1.3.0
 synopsis: Array library monomorphized with backpack
 bug-reports: https://github.com/andrewthad/vex-unified/issues
 license: BSD-3-Clause
@@ -228,6 +228,7 @@ library inst
     , Vector.Map.Int64.Lifted
     , Vector.Map.Unlifted.Lifted
     , Vector.Map.Lifted.Int32
+    , Vector.Map.Lifted.Int64
     , Vector.Map.Lifted.Lifted
     , Vector.Map.Lifted.Unlifted
     , Vector.Zip.Unlifted.Word32.Lifted
@@ -274,6 +275,8 @@ library inst
       (ElementA as Unlifted, RepA as Unlifted, ElementB as Int32, RepB as Int32),
     vext:map-indef (MapVector as Vector.Map.Lifted.Int32) requires
       (ElementA as Lifted, RepA as Lifted, ElementB as Int32, RepB as Int32),
+    vext:map-indef (MapVector as Vector.Map.Lifted.Int64) requires
+      (ElementA as Lifted, RepA as Lifted, ElementB as Int64, RepB as Int64),
     vext:map-indef (MapVector as Vector.Map.Lifted.Lifted) requires
       (ElementA as Lifted, RepA as Lifted, ElementB as Lifted, RepB as Lifted),
     vext:map-indef (MapVector as Vector.Map.Lifted.Unlifted) requires
@@ -386,9 +389,14 @@ library
     , Vector.Std.Word8
     , Vector.Std.Word
     , Vector.Map.Lifted.Int32
+    , Vector.Map.Lifted.Int64
     , Vector.Map.Lifted.Lifted
     , Vector.Map.Lifted.Unlifted
+    , Vector.Map.Word8.Lifted
     , Vector.Map.Word16.Lifted
+    , Vector.Map.Word32.Lifted
+    , Vector.Map.Word64.Lifted
+    , Vector.Map.Int64.Lifted
     , Vector.Map.Unlifted.Lifted
     , Vector.Zip.Unlifted.Word32.Lifted
     , Vector.Zip.Unlifted.Lifted.Lifted
