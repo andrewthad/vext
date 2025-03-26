@@ -30,6 +30,8 @@ module Int64
   , gt#
   , eq#
   , max
+    -- Metadata
+  , size
   ) where
 
 import Prelude hiding (max)
@@ -178,3 +180,8 @@ copy# :: forall (s :: Type) (a :: TYPE R).
   -> State# s
 copy# (MutablePrimArray# m) doff (PrimArray# v) soff len s0 =
   Exts.copyByteArray# v (8# *# soff) m (8# *# doff) (8# *# len) s0
+
+size :: Int
+{-# inline size #-}
+size = 8
+

@@ -30,6 +30,8 @@ module Int32
   , eq#
   , max
   , freeze#
+    -- Metadata
+  , size
   ) where
 
 import Prelude hiding (max)
@@ -50,6 +52,10 @@ unsafeFromI32 x = unsafeCoerce# x
 
 unsafeToI32 :: forall (a :: TYPE 'Int32Rep). a -> Int32#
 unsafeToI32 x = unsafeCoerce# x
+
+size :: Int
+{-# inline size #-}
+size = 4
 
 index# :: forall (a :: TYPE R). A# a -> Int# -> a
 {-# inline index# #-}

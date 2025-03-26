@@ -1,6 +1,6 @@
 cabal-version: 3.4
 name: vext
-version: 0.1.3.0
+version: 0.1.4.0
 synopsis: Array library monomorphized with backpack
 bug-reports: https://github.com/andrewthad/vex-unified/issues
 license: BSD-3-Clause
@@ -23,6 +23,22 @@ library indef
     , natural-arithmetic
     , unlifted
   hs-source-dirs: src-indef
+  default-language: Haskell2010
+  ghc-options: -O2 -Wall
+
+library prim-indef
+  exposed-modules:
+    PrimVector
+  build-depends:
+    , base >=4.12.0.0 && <5
+    , natural-arithmetic
+    , unlifted
+    , primitive >=0.9
+    , vext:indef
+  signatures:
+    Element
+    Rep
+  hs-source-dirs: src-prim-indef
   default-language: Haskell2010
   ghc-options: -O2 -Wall
 
@@ -209,9 +225,13 @@ library inst
     , Vector.Ord.Int32
     , Vector.Ord.Word8
     , Vector.Ord.Word16
+    , Vector.Ord.Word32
+    , Vector.Ord.Word64
     , Vector.Eq.Int16
     , Vector.Eq.Word8
     , Vector.Eq.Word16
+    , Vector.Eq.Word32
+    , Vector.Eq.Word64
     , Vector.Eq.Int32
     , Vector.Masked.Word128
     , Vector.Masked.Word16
@@ -236,6 +256,12 @@ library inst
     , Vector.Zip.Word16.Lifted.Lifted
     , Vector.Zip.Lifted.Word16.Lifted
     , Vector.Zip.Bit.Bit.Bit
+    , Vector.Prim.Int32
+    , Vector.Prim.Int64
+    , Vector.Prim.Word8
+    , Vector.Prim.Word16
+    , Vector.Prim.Word32
+    , Vector.Prim.Word64
   build-depends:
     , vext:imp
     , vext:indef
@@ -245,6 +271,7 @@ library inst
     , vext:rep-eq-indef
     , vext:type-eq-indef
     , vext:mask-indef
+    , vext:prim-indef
     , primitive >=0.7
   mixins:
     vext:indef (Vector as Vector.Std.Word) requires (Element as Word, Rep as Word),
@@ -301,6 +328,8 @@ library inst
     vext:ord-indef (OrdVector as Vector.Ord.Int16) requires (Element as Int16, Rep as Int16),
     vext:ord-indef (OrdVector as Vector.Ord.Word8) requires (Element as Word8, Rep as Word8),
     vext:ord-indef (OrdVector as Vector.Ord.Word16) requires (Element as Word16, Rep as Word16),
+    vext:ord-indef (OrdVector as Vector.Ord.Word32) requires (Element as Word32, Rep as Word32),
+    vext:ord-indef (OrdVector as Vector.Ord.Word64) requires (Element as Word64, Rep as Word64),
     vext:ord-indef (OrdVector as Vector.Ord.Int32) requires (Element as Int32, Rep as Int32),
     vext:ord-indef (OrdVector as Vector.Ord.Int64) requires (Element as Int64, Rep as Int64),
     vext:rep-eq-indef (EqVector as Vector.Eq.Int) requires (Element as Int, Rep as Int),
@@ -308,6 +337,14 @@ library inst
     vext:rep-eq-indef (EqVector as Vector.Eq.Int16) requires (Element as Int16, Rep as Int16),
     vext:rep-eq-indef (EqVector as Vector.Eq.Word8) requires (Element as Word8, Rep as Word8),
     vext:rep-eq-indef (EqVector as Vector.Eq.Word16) requires (Element as Word16, Rep as Word16),
+    vext:rep-eq-indef (EqVector as Vector.Eq.Word32) requires (Element as Word32, Rep as Word32),
+    vext:rep-eq-indef (EqVector as Vector.Eq.Word64) requires (Element as Word64, Rep as Word64),
+    vext:prim-indef (PrimVector as Vector.Prim.Int32) requires (Element as Int32, Rep as Int32),
+    vext:prim-indef (PrimVector as Vector.Prim.Int64) requires (Element as Int64, Rep as Int64),
+    vext:prim-indef (PrimVector as Vector.Prim.Word8) requires (Element as Word8, Rep as Word8),
+    vext:prim-indef (PrimVector as Vector.Prim.Word16) requires (Element as Word16, Rep as Word16),
+    vext:prim-indef (PrimVector as Vector.Prim.Word32) requires (Element as Word32, Rep as Word32),
+    vext:prim-indef (PrimVector as Vector.Prim.Word64) requires (Element as Word64, Rep as Word64),
 
 library pair-indef
   exposed-modules:

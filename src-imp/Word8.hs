@@ -29,6 +29,8 @@ module Word8
   , gt#
   , eq#
   , max
+    -- Metadata
+  , size
   ) where
 
 import Prelude hiding (max)
@@ -164,3 +166,7 @@ gt# x y = gtWord8# (unsafeToW8 x) (unsafeToW8 y)
 eq# :: forall (a :: TYPE R). a -> a -> Int#
 {-# inline eq# #-}
 eq# x y = eqWord8# (unsafeToW8 x) (unsafeToW8 y)
+
+size :: Int
+{-# inline size #-}
+size = 1

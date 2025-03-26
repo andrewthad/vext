@@ -40,8 +40,13 @@ module Vector.Int32
   , ifoldl'
   , ifoldlSlice'
   , replicate
+  , construct1
+  , construct2
   , construct3
   , construct4
+  , construct5
+  , construct6
+  , construct7
   , append
   , clone
   , cloneSlice
@@ -64,9 +69,13 @@ module Vector.Int32
     -- * Custom
   , cumulativeSum1
   , toFins
+    -- * Show
+  , show
+    -- * Interop with primitive
+  , cloneFromByteArray
   ) where
 
-import Prelude hiding (replicate,map,maximum,Bounded,all)
+import Prelude hiding (replicate,map,maximum,Bounded,all,show)
 
 import Vector.Std.Int32
 import Vector.Ord.Int32
@@ -77,10 +86,14 @@ import GHC.Exts (Int32#)
 import GHC.Int (Int(I#),Int32(I32#),Int64(I64#))
 import GHC.TypeNats (type (+))
 import Arithmetic.Types (Nat#,Fin32#)
+import Data.Primitive (ByteArray(ByteArray))
+import Data.Unlifted (PrimArray#(PrimArray#))
 
 import qualified GHC.Exts as Exts
 import qualified Arithmetic.Fin as Fin
 import qualified Arithmetic.Nat as Nat
+import qualified Data.Primitive as PM
+import qualified Vector.Prim.Int32
 
 -- | Crashes if the sum of all the elements exceeds the maximum
 cumulativeSum1 ::
@@ -111,3 +124,17 @@ toFins ::
 toFins m n !v = if all (\v# -> let w = I32# v# in w >= 0 && fromIntegral @Int32 @Int w < I# (Nat.demote# m)) n v
   then Just (unsafeCoerceVector v)
   else Nothing
+
+-- | Crashes the program if the range is out of bounds. That is,
+-- behavior is always well defined.
+--
+-- Interprets the bytes in a native-endian fashion.
+cloneFromByteArray ::
+     Int    -- ^ Offset into byte array, units are elements, not bytes
+  -> Nat# n -- ^ Length of the vector, units are elements, not bytes
+  -> ByteArray
+  -> Vector n Int32#
+cloneFromByteArray = Vector.Prim.Int32.unsafeCloneFromByteArray
+
+show :: Nat# n -> Vector n Int32# -> String
+show n v = liftShows (\i s -> shows (I32# i) s) n v ""

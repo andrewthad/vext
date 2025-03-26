@@ -70,6 +70,7 @@ module Vector
   , ifoldr
   , ifoldl'
   , ifoldlSlice'
+  , liftShows
   , replicate
   , construct1
   , construct2
@@ -182,6 +183,17 @@ foldr :: forall (n :: GHC.Nat) (a :: TYPE R) (b :: Type).
   -> b
 {-# inline foldr #-}
 foldr f b0 n v = Fin.descend# n b0 (\fin b -> f (index v fin) b)
+
+liftShows :: forall (n :: GHC.Nat) (a :: TYPE R).
+     (a -> String -> String)
+  -> Nat# n
+  -> Vector n a
+  -> String
+  -> String
+liftShows f n v s0 = case foldr (\e acc -> ',' : f e acc) (']' : s0) n v of
+  s@(']' : _) -> '[' : s
+  ',' : s -> '[' : s
+  _ -> errorWithoutStackTrace "vext.Vector.liftShow: impossible"
 
 ifoldr :: forall (n :: GHC.Nat) (a :: TYPE R) (b :: Type).
      (Fin# n -> a -> b -> b)

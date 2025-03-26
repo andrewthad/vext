@@ -30,6 +30,8 @@ module Word16
   , gt#
   , eq#
   , max
+    -- Metadata
+  , size
   ) where
 
 import Prelude hiding (max)
@@ -179,3 +181,6 @@ eq# :: forall (a :: TYPE R). a -> a -> Int#
 {-# inline eq# #-}
 eq# x y = eqWord16# (unsafeToW16 x) (unsafeToW16 y)
 
+size :: Int
+{-# inline size #-}
+size = 2

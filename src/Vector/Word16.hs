@@ -75,10 +75,35 @@ module Vector.Word16
   , mapEq
     -- * Hide Length
   , vector_
+    -- * Show
+  , show
+    -- * Interop with primitive
+  , cloneFromByteArray
   ) where
 
-import Prelude hiding (replicate,map,maximum,Bounded,all,any,elem)
+import Prelude hiding (replicate,map,maximum,Bounded,all,any,elem,show)
 
-import Vector.Std.Word16
-import Vector.Ord.Word16
+import Arithmetic.Types (Nat#)
+import Data.Primitive (ByteArray)
+import GHC.Exts (Word16#)
+import GHC.Word (Word16(W16#))
+
 import Vector.Eq.Word16
+import Vector.Ord.Word16
+import Vector.Std.Word16
+
+import qualified Vector.Prim.Word16
+
+-- | Crashes the program if the range is out of bounds. That is,
+-- behavior is always well defined.
+--
+-- Interprets the bytes in a native-endian fashion.
+cloneFromByteArray ::
+     Int    -- ^ Offset into byte array, units are elements, not bytes
+  -> Nat# n -- ^ Length of the vector, units are elements, not bytes
+  -> ByteArray
+  -> Vector n Word16#
+cloneFromByteArray = Vector.Prim.Word16.unsafeCloneFromByteArray
+
+show :: Nat# n -> Vector n Word16# -> String
+show n v = liftShows (\i s -> shows (W16# i) s) n v ""

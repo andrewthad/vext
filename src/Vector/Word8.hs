@@ -75,11 +75,35 @@ module Vector.Word8
   , mapEq
     -- * Hide Length
   , vector_
+    -- * Show
+  , show
+    -- * Interop with primitive
+  , cloneFromByteArray
   ) where
 
-import Prelude hiding (replicate,map,maximum,Bounded,all,any,elem)
+import Prelude hiding (replicate,map,maximum,Bounded,all,any,elem,show)
+
+import Arithmetic.Types (Nat#)
+import Data.Primitive (ByteArray)
+import GHC.Exts (Word8#)
+import GHC.Word (Word8(W8#))
 
 import Vector.Std.Word8
 import Vector.Ord.Word8
 import Vector.Eq.Word8
 
+import qualified Vector.Prim.Word8
+
+-- | Crashes the program if the range is out of bounds. That is,
+-- behavior is always well defined.
+--
+-- Interprets the bytes in a native-endian fashion.
+cloneFromByteArray ::
+     Int    -- ^ Offset into byte array, units are elements, not bytes
+  -> Nat# n -- ^ Length of the vector, units are elements, not bytes
+  -> ByteArray
+  -> Vector n Word8#
+cloneFromByteArray = Vector.Prim.Word8.unsafeCloneFromByteArray
+
+show :: Nat# n -> Vector n Word8# -> String
+show n v = liftShows (\i s -> shows (W8# i) s) n v ""

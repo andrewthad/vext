@@ -22,7 +22,19 @@ module Word64
   , thaw#
   , freeze#
   , copy#
+    -- Comparison
+  , lt
+  , gt
+  , eq
+  , lt#
+  , gt#
+  , eq#
+  , max
+    -- Metadata
+  , size
   ) where
+
+import Prelude hiding (max)
 
 import GHC.Exts
 import Data.Kind (Type)
@@ -140,3 +152,35 @@ copy# :: forall (s :: Type) (a :: TYPE R).
   -> State# s
 copy# (MutablePrimArray# m) doff (PrimArray# v) soff len s0 =
   Exts.copyByteArray# v (8# *# soff) m (8# *# doff) (8# *# len) s0
+
+size :: Int
+{-# inline size #-}
+size = 8
+
+max :: forall (a :: TYPE R). a -> a -> a
+{-# inline max #-}
+max x y = if gt x y then x else y
+
+lt :: forall (a :: TYPE R). a -> a -> Bool
+{-# inline lt #-}
+lt x y = isTrue# (ltWord64# (unsafeToW64 x) (unsafeToW64 y))
+
+gt :: forall (a :: TYPE R). a -> a -> Bool
+{-# inline gt #-}
+gt x y = isTrue# (gtWord64# (unsafeToW64 x) (unsafeToW64 y))
+
+eq :: forall (a :: TYPE R). a -> a -> Bool
+{-# inline eq #-}
+eq x y = isTrue# (eqWord64# (unsafeToW64 x) (unsafeToW64 y))
+
+lt# :: forall (a :: TYPE R). a -> a -> Int#
+{-# inline lt# #-}
+lt# x y = ltWord64# (unsafeToW64 x) (unsafeToW64 y)
+
+gt# :: forall (a :: TYPE R). a -> a -> Int#
+{-# inline gt# #-}
+gt# x y = gtWord64# (unsafeToW64 x) (unsafeToW64 y)
+
+eq# :: forall (a :: TYPE R). a -> a -> Int#
+{-# inline eq# #-}
+eq# x y = eqWord64# (unsafeToW64 x) (unsafeToW64 y)
