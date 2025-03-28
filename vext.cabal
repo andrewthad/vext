@@ -1,6 +1,6 @@
 cabal-version: 3.4
 name: vext
-version: 0.1.4.0
+version: 0.1.5.0
 synopsis: Array library monomorphized with backpack
 bug-reports: https://github.com/andrewthad/vex-unified/issues
 license: BSD-3-Clause
@@ -169,6 +169,7 @@ library imp
     EmptyPrimArray
   exposed-modules:
     Int
+    Int8
     Int16
     Int32
     Int64
@@ -216,22 +217,25 @@ library inst
     , Vector.Std.Word32
     , Vector.Std.Word64
     , Vector.Std.Word128
+    , Vector.Std.Int8
     , Vector.Std.Int16
     , Vector.Std.Int32
     , Vector.Std.Int
     , Vector.Eq.Int
     , Vector.Ord.Int
+    , Vector.Ord.Int8
     , Vector.Ord.Int16
     , Vector.Ord.Int32
     , Vector.Ord.Word8
     , Vector.Ord.Word16
     , Vector.Ord.Word32
     , Vector.Ord.Word64
-    , Vector.Eq.Int16
     , Vector.Eq.Word8
     , Vector.Eq.Word16
     , Vector.Eq.Word32
     , Vector.Eq.Word64
+    , Vector.Eq.Int8
+    , Vector.Eq.Int16
     , Vector.Eq.Int32
     , Vector.Masked.Word128
     , Vector.Masked.Word16
@@ -256,6 +260,7 @@ library inst
     , Vector.Zip.Word16.Lifted.Lifted
     , Vector.Zip.Lifted.Word16.Lifted
     , Vector.Zip.Bit.Bit.Bit
+    , Vector.Prim.Int8
     , Vector.Prim.Int32
     , Vector.Prim.Int64
     , Vector.Prim.Word8
@@ -280,6 +285,7 @@ library inst
     vext:indef (Vector as Vector.Std.Word32) requires (Element as Word32, Rep as Word32),
     vext:indef (Vector as Vector.Std.Word64) requires (Element as Word64, Rep as Word64),
     vext:indef (Vector as Vector.Std.Word128) requires (Element as Word128, Rep as Word128),
+    vext:indef (Vector as Vector.Std.Int8) requires (Element as Int8, Rep as Int8),
     vext:indef (Vector as Vector.Std.Int32) requires (Element as Int32, Rep as Int32),
     vext:indef (Vector as Vector.Std.Int16) requires (Element as Int16, Rep as Int16),
     vext:indef (Vector as Vector.Std.Int) requires (Element as Int, Rep as Int),
@@ -325,6 +331,7 @@ library inst
     vext:type-eq-indef (TypeEqVector as Vector.Std.Unlifted.Eq.ShortText)
       requires (Element as Unlifted, Rep as Unlifted, Type as ShortText),
     vext:ord-indef (OrdVector as Vector.Ord.Int) requires (Element as Int, Rep as Int),
+    vext:ord-indef (OrdVector as Vector.Ord.Int8) requires (Element as Int8, Rep as Int8),
     vext:ord-indef (OrdVector as Vector.Ord.Int16) requires (Element as Int16, Rep as Int16),
     vext:ord-indef (OrdVector as Vector.Ord.Word8) requires (Element as Word8, Rep as Word8),
     vext:ord-indef (OrdVector as Vector.Ord.Word16) requires (Element as Word16, Rep as Word16),
@@ -335,10 +342,12 @@ library inst
     vext:rep-eq-indef (EqVector as Vector.Eq.Int) requires (Element as Int, Rep as Int),
     vext:rep-eq-indef (EqVector as Vector.Eq.Int32) requires (Element as Int32, Rep as Int32),
     vext:rep-eq-indef (EqVector as Vector.Eq.Int16) requires (Element as Int16, Rep as Int16),
+    vext:rep-eq-indef (EqVector as Vector.Eq.Int8) requires (Element as Int8, Rep as Int8),
     vext:rep-eq-indef (EqVector as Vector.Eq.Word8) requires (Element as Word8, Rep as Word8),
     vext:rep-eq-indef (EqVector as Vector.Eq.Word16) requires (Element as Word16, Rep as Word16),
     vext:rep-eq-indef (EqVector as Vector.Eq.Word32) requires (Element as Word32, Rep as Word32),
     vext:rep-eq-indef (EqVector as Vector.Eq.Word64) requires (Element as Word64, Rep as Word64),
+    vext:prim-indef (PrimVector as Vector.Prim.Int8) requires (Element as Int8, Rep as Int8),
     vext:prim-indef (PrimVector as Vector.Prim.Int32) requires (Element as Int32, Rep as Int32),
     vext:prim-indef (PrimVector as Vector.Prim.Int64) requires (Element as Int64, Rep as Int64),
     vext:prim-indef (PrimVector as Vector.Prim.Word8) requires (Element as Word8, Rep as Word8),
@@ -449,6 +458,7 @@ library
     Vector.Word128
     Vector.Word128.Masked
     Vector.Int
+    Vector.Int8
     Vector.Int16
     Vector.Int32
     Vector.Int64
