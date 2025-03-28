@@ -1,6 +1,6 @@
 cabal-version: 3.4
 name: vext
-version: 0.1.5.0
+version: 0.1.6.0
 synopsis: Array library monomorphized with backpack
 bug-reports: https://github.com/andrewthad/vex-unified/issues
 license: BSD-3-Clause
@@ -249,6 +249,9 @@ library inst
     , Vector.Map.Word16.Lifted
     , Vector.Map.Word32.Lifted
     , Vector.Map.Word64.Lifted
+    , Vector.Map.Int8.Lifted
+    , Vector.Map.Int16.Lifted
+    , Vector.Map.Int32.Lifted
     , Vector.Map.Int64.Lifted
     , Vector.Map.Unlifted.Lifted
     , Vector.Map.Lifted.Int32
@@ -326,6 +329,12 @@ library inst
       (ElementA as Word64, RepA as Word64, ElementB as Lifted, RepB as Lifted),
     vext:map-indef (MapVector as Vector.Map.Int64.Lifted) requires
       (ElementA as Int64, RepA as Int64, ElementB as Lifted, RepB as Lifted),
+    vext:map-indef (MapVector as Vector.Map.Int32.Lifted) requires
+      (ElementA as Int32, RepA as Int32, ElementB as Lifted, RepB as Lifted),
+    vext:map-indef (MapVector as Vector.Map.Int16.Lifted) requires
+      (ElementA as Int16, RepA as Int16, ElementB as Lifted, RepB as Lifted),
+    vext:map-indef (MapVector as Vector.Map.Int8.Lifted) requires
+      (ElementA as Int8, RepA as Int8, ElementB as Lifted, RepB as Lifted),
     vext:indef (Vector as Vector.Std.Lifted) requires (Element as Lifted, Rep as Lifted),
     vext:indef (Vector as Vector.Std.Unlifted) requires (Element as Unlifted, Rep as Unlifted),
     vext:type-eq-indef (TypeEqVector as Vector.Std.Unlifted.Eq.ShortText)
@@ -442,6 +451,9 @@ library
     , Vector.Map.Word16.Lifted
     , Vector.Map.Word32.Lifted
     , Vector.Map.Word64.Lifted
+    , Vector.Map.Int8.Lifted
+    , Vector.Map.Int16.Lifted
+    , Vector.Map.Int32.Lifted
     , Vector.Map.Int64.Lifted
     , Vector.Map.Unlifted.Lifted
     , Vector.Zip.Unlifted.Word32.Lifted
