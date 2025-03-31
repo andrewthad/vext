@@ -40,6 +40,8 @@ module Vector.Int16
   , ifoldl'
   , ifoldlSlice'
   , replicate
+  , empty
+  , empty_
   , construct3
   , construct4
   , append

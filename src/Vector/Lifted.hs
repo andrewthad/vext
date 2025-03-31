@@ -50,6 +50,7 @@ module Vector.Lifted
   , foldrZip
   , replicate
   , empty
+  , empty#
   , equals
   , construct1
   , construct2

@@ -42,6 +42,8 @@ module Vector.Int64
   , traverse_
   , itraverse_
   , replicate
+  , empty
+  , empty_
   , construct3
   , construct4
   , append

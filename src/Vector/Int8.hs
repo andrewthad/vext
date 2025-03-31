@@ -42,6 +42,8 @@ module Vector.Int8
   , ifoldl'
   , ifoldlSlice'
   , replicate
+  , empty
+  , empty_
   , construct1
   , construct3
   , construct4

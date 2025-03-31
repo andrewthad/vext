@@ -39,6 +39,8 @@ module Vector.Unlifted
   , ifoldl'
   , ifoldlSlice'
   , replicate
+  , empty
+  , empty#
   , construct1
   , construct2
   , construct3

@@ -40,6 +40,8 @@ module Vector.Word64
   , ifoldl'
   , ifoldlSlice'
   , replicate
+  , empty
+  , empty_
   , construct3
   , construct4
   , append

@@ -43,6 +43,9 @@ module Vector.Bit
   , construct4
   , construct5
   , replicate
+  , empty
+  , empty_
+  , empty#
   , append
   , clone
   , cloneSlice

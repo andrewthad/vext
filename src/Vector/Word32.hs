@@ -42,6 +42,8 @@ module Vector.Word32
   , ifoldl'
   , ifoldlSlice'
   , replicate
+  , empty
+  , empty_
   , construct1
   , construct3
   , construct4
