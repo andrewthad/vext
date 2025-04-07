@@ -8,6 +8,8 @@ module Vector.Unlifted
   , MutableVector(..)
   , MutableVector#
   , Bounded(..)
+  , Vector_(..)
+  , FromMutability#
     -- * Primitives
   , write#
   , write

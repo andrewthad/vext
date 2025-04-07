@@ -13,6 +13,7 @@ module Vector.Int8
   , MutableVector#
   , Bounded(..)
   , Vector_(..)
+  , FromMutability#
     -- * Primitives
   , write#
   , write
