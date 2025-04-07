@@ -1,10 +1,11 @@
 {-# language BangPatterns #-}
+{-# language DataKinds #-}
 {-# language MagicHash #-}
+{-# language PolyKinds #-}
 {-# language RankNTypes #-}
+{-# language StandaloneKindSignatures #-}
 {-# language TypeApplications #-}
 {-# language TypeFamilies #-}
-{-# language TypeInType #-}
-{-# language StandaloneKindSignatures #-}
 {-# language UnboxedTuples #-}
 
 module Int16

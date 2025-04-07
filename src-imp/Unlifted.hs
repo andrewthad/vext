@@ -1,12 +1,13 @@
 {-# language BangPatterns #-}
+{-# language DataKinds #-}
 {-# language GADTSyntax #-}
 {-# language MagicHash #-}
+{-# language PolyKinds #-}
 {-# language RankNTypes #-}
 {-# language ScopedTypeVariables #-}
 {-# language StandaloneKindSignatures #-}
 {-# language TypeApplications #-}
 {-# language TypeFamilies #-}
-{-# language TypeInType #-}
 {-# language UnboxedTuples #-}
 {-# language UnliftedNewtypes #-}
 

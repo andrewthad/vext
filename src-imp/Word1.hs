@@ -1,10 +1,12 @@
 {-# language BangPatterns #-}
+{-# language DataKinds #-}
 {-# language MagicHash #-}
+{-# language PolyKinds #-}
 {-# language RankNTypes #-}
+{-# language ScopedTypeVariables #-}
+{-# language StandaloneKindSignatures #-}
 {-# language TypeApplications #-}
 {-# language TypeFamilies #-}
-{-# language TypeInType #-}
-{-# language StandaloneKindSignatures #-}
 {-# language UnboxedTuples #-}
 
 -- Note: In this module, we assume that Word is a 64-bit number.

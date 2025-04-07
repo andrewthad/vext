@@ -1,11 +1,12 @@
-{-# language CPP #-}
 {-# language BangPatterns #-}
+{-# language CPP #-}
+{-# language DataKinds #-}
 {-# language MagicHash #-}
+{-# language PolyKinds #-}
 {-# language RankNTypes #-}
+{-# language StandaloneKindSignatures #-}
 {-# language TypeApplications #-}
 {-# language TypeFamilies #-}
-{-# language TypeInType #-}
-{-# language StandaloneKindSignatures #-}
 {-# language UnboxedTuples #-}
 
 module Word128

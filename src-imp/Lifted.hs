@@ -1,11 +1,12 @@
 {-# language BangPatterns #-}
+{-# language DataKinds #-}
 {-# language MagicHash #-}
+{-# language PolyKinds #-}
 {-# language RankNTypes #-}
-{-# language TypeApplications #-}
-{-# language TypeFamilies #-}
-{-# language TypeInType #-}
 {-# language ScopedTypeVariables #-}
 {-# language StandaloneKindSignatures #-}
+{-# language TypeApplications #-}
+{-# language TypeFamilies #-}
 {-# language UnboxedTuples #-}
 
 module Lifted
