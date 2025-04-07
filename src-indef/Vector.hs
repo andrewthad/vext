@@ -1,18 +1,20 @@
 {-# language BangPatterns #-}
-{-# language PatternSynonyms #-}
 {-# language BlockArguments #-}
 {-# language DataKinds #-}
 {-# language ExplicitNamespaces #-}
 {-# language GADTs #-}
 {-# language KindSignatures #-}
 {-# language MagicHash #-}
-{-# language UnliftedNewtypes #-}
+{-# language PatternSynonyms #-}
 {-# language RankNTypes #-}
 {-# language ScopedTypeVariables #-}
+{-# language StandaloneKindSignatures #-}
 {-# language TypeApplications #-}
+{-# language TypeFamilies #-}
 {-# language TypeOperators #-}
-{-# language UnboxedTuples #-}
 {-# language UnboxedSums #-}
+{-# language UnboxedTuples #-}
+{-# language UnliftedNewtypes #-}
 
 -- The only operatations defined in this module are those
 -- that are considered primitive. That is, they cannot be
@@ -26,6 +28,7 @@ module Vector
   , C.MutableVector#
   , Bounded(..)
   , Vector_(..)
+  , FromMutability#
   , vector_
     -- * Primitives
   , C.write#
@@ -106,11 +109,12 @@ module Vector
 
 import Prelude hiding (read,map,Bounded,replicate,all,any,foldr)
 
+import Types (Mutability(Mutable,Immutable))
 import Core (Vector(..),Vector#,MutableVector(..),unsafeFreeze,index,write)
 import Data.Unlifted (Maybe#(..))
 import Rep (R)
 import Element (A#,M#)
-import GHC.Exts (Int(I#),RuntimeRep)
+import GHC.Exts (Int(I#),RuntimeRep(BoxedRep),Levity(Unlifted))
 import GHC.ST (ST,runST)
 import Data.Kind (Type)
 import GHC.Exts (TYPE,State#,Int#,(*#))
@@ -149,6 +153,13 @@ data Vector_ :: TYPE R -> Type where
        (Nat# n)
     -> (Vector# n a)
     -> Vector_ a
+
+-- | A type family that helps the user define data types that support
+-- both mutable and immutable vectors.
+type FromMutability# :: Mutability -> (GHC.Nat -> TYPE R -> TYPE ('BoxedRep 'Unlifted))
+type family FromMutability# m :: (GHC.Nat -> TYPE R -> TYPE ('BoxedRep 'Unlifted)) where
+  FromMutability# 'Immutable = C.Vector#
+  FromMutability# ('Mutable s) = C.MutableVector# s
 
 ifoldlSlice' :: forall (i :: GHC.Nat) (m :: GHC.Nat) (n :: GHC.Nat) (a :: TYPE R) (b :: Type).
      (i + n <= m)

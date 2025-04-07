@@ -10,6 +10,15 @@ maintainer: andrew.thaddeus@gmail.com
 copyright: 2019 Andrew Martin
 category: Data
 
+library types
+  exposed-modules:
+    Types
+  build-depends:
+    , base >=4.12.0.0 && <5
+  hs-source-dirs: src-types
+  default-language: Haskell2010
+  ghc-options: -O2 -Wall
+
 library indef
   exposed-modules:
     Vector
@@ -22,6 +31,7 @@ library indef
     , base >=4.12.0.0 && <5
     , natural-arithmetic
     , unlifted
+    , vext:types
   hs-source-dirs: src-indef
   default-language: Haskell2010
   ghc-options: -O2 -Wall

@@ -13,6 +13,7 @@ module Vector.Word8
   , MutableVector#
   , Bounded(..)
   , Vector_(..)
+  , FromMutability#
     -- * Primitives
   , write#
   , write
