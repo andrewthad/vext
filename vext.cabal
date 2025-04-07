@@ -491,6 +491,7 @@ library
     Vector.Unlifted.ByteArray
     Vector.Unlifted.ShortText
     Vector.Unlifted.Masked
+    Vector.Types
   build-depends:
     , base >=4.12.0.0 && <5 
     , natural-arithmetic
