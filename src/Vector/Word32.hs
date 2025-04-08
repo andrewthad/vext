@@ -22,7 +22,9 @@ module Vector.Word32
   , index
   , unlift
   , substitute
+  , substitute#
   , initialized
+  , initialized#
   , unsafeCoerceLength
   , expose
   , expose#
@@ -40,6 +42,9 @@ module Vector.Word32
   , any
   , all
   , map
+  , traverse_
+  , traverseZip_
+  , traverseST#
   , ifoldl'
   , ifoldlSlice'
   , replicate

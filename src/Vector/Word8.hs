@@ -22,7 +22,9 @@ module Vector.Word8
   , index
   , unlift
   , substitute
+  , substitute#
   , initialized
+  , initialized#
   , unsafeCoerceLength
   , expose
   , expose#
@@ -40,8 +42,16 @@ module Vector.Word8
   , any
   , all
   , map
+  , traverse_
+  , traverseZip_
+  , traverseST#
+  , itraverse_
+  , foldlM
   , ifoldl'
   , ifoldlSlice'
+  , ifoldr
+  , foldr
+  , foldrZip
   , replicate
   , empty
   , empty_
@@ -84,7 +94,7 @@ module Vector.Word8
   , cloneFromByteArray
   ) where
 
-import Prelude hiding (replicate,map,maximum,Bounded,all,any,elem,show)
+import Prelude hiding (replicate,map,maximum,Bounded,all,any,elem,show,foldr)
 
 import Arithmetic.Types (Nat#)
 import Data.Primitive (ByteArray)

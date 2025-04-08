@@ -38,7 +38,9 @@ module Vector
   , C.index
   , unlift
   , C.substitute
+  , C.substitute#
   , C.initialized
+  , C.initialized#
   , C.empty#
   , C.empty
   , C.unsafeCoerceLength
@@ -65,6 +67,7 @@ module Vector
   , findIndex
   , traverse_
   , traverseZip_
+  , traverseST#
   , itraverse_
   , itraverse_#
   , foldlM
@@ -237,6 +240,26 @@ traverseZip_ :: forall (n :: GHC.Nat) (m :: Type -> Type) (a :: TYPE R) (b :: TY
 traverseZip_ f n v w = Fin.ascendM_# n
   (\fin -> f (index v fin) (index w fin)
   )
+
+traverseST# :: forall (n :: GHC.Nat) (s :: Type) (a :: TYPE R) (b :: TYPE R).
+     (a -> State# s -> (# State# s, b #))
+  -> Nat# n
+  -> Vector# n a
+  -> State# s
+  -> (# State# s, Vector# n b #)
+{-# inline traverseST# #-}
+traverseST# f n v s0 = case Nat.testZero# n of
+  LeftVoid# zeq -> (# s0, C.substitute# zeq (C.empty# (# #)) #)
+  RightVoid# zlt ->
+    let !(# s1, b0 #) = f (C.index# v (Fin.construct# zlt Nat.N0#)) s0 in
+    let !(# s2, dst #) = C.initialized# n b0 s1 in
+    let go :: forall p. Nat# p -> State# s -> (# State# s, Vector# n b #)
+        go m t0 = case m <?# n of
+          JustVoid# lt -> case f (C.index# v (Fin.construct# lt m)) t0 of
+            (# t1, e #) -> case C.write# dst (Fin.construct# lt m) e t1 of
+              t2 -> go (Nat.succ# m) t2
+          _ -> C.unsafeFreeze# dst t0
+     in go Nat.N1# s2
 
 itraverse_ :: forall (n :: GHC.Nat) (m :: Type -> Type) (a :: TYPE R) (b :: Type).
      Monad m

@@ -19,7 +19,9 @@ module Vector.Bit
   , index
   , unlift
   , substitute
+  , substitute#
   , initialized
+  , initialized#
   , unsafeCoerceLength
   , expose
   , expose#
@@ -35,6 +37,10 @@ module Vector.Bit
   , thaw
     -- * Composite
   , map
+  , traverse_
+  , itraverse_
+  , itraverse_#
+  , traverseST#
   , ifoldl'
   , ifoldlSlice'
   , construct1

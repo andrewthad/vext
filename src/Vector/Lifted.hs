@@ -23,7 +23,9 @@ module Vector.Lifted
   , index
   , unlift
   , substitute
+  , substitute#
   , initialized
+  , initialized#
   , unsafeCoerceLength
     -- * Ranges
   , set
@@ -43,6 +45,7 @@ module Vector.Lifted
   , traverse_
   , traverseZip_
   , itraverse_
+  , traverseST#
   , foldlM
   , ifoldl'
   , ifoldlSlice'

@@ -22,7 +22,9 @@ module Vector.Word64
   , index
   , unlift
   , substitute
+  , substitute#
   , initialized
+  , initialized#
   , unsafeCoerceLength
   , expose
   , expose#
@@ -38,6 +40,9 @@ module Vector.Word64
   , thaw
     -- * Composite
   , map
+  , traverse_
+  , traverseZip_
+  , traverseST#
   , ifoldl'
   , ifoldlSlice'
   , replicate

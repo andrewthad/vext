@@ -22,7 +22,9 @@ module Vector.Int64
   , index
   , unlift
   , substitute
+  , substitute#
   , initialized
+  , initialized#
   , unsafeCoerceLength
   , expose
   , expose#
@@ -38,6 +40,10 @@ module Vector.Int64
   , thaw
     -- * Composite
   , map
+  , traverse_
+  , itraverse_
+  , itraverse_#
+  , traverseST#
   , foldr
   , ifoldl'
   , ifoldlSlice'

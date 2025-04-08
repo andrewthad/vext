@@ -22,7 +22,9 @@ module Vector.Int8
   , index
   , unlift
   , substitute
+  , substitute#
   , initialized
+  , initialized#
   , unsafeCoerceLength
   , expose
   , expose#
@@ -40,6 +42,10 @@ module Vector.Int8
   , any
   , all
   , map
+  , traverse_
+  , itraverse_
+  , itraverse_#
+  , traverseST#
   , ifoldl'
   , ifoldlSlice'
   , replicate

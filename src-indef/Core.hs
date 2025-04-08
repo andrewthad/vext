@@ -49,6 +49,7 @@ module Core
   , write#
   , write
   , initialized
+  , initialized#
   , empty#
   , empty
   , unsafeShrinkFreeze
@@ -62,6 +63,7 @@ module Core
   , unsafeCoerceVector
   , unsafeCoerceVector#
   , substitute
+  , substitute#
   , expose
   , expose#
   ) where
@@ -149,6 +151,14 @@ initialized :: forall (s :: Type) (n :: GHC.Nat) (a :: TYPE R).
 initialized !(Nat# n) a = ST $ \s0 -> case A.initialized# n a s0 of
   (# s1, x #) -> (# s1, MutableVector (MutableVector# x) #)
 
+initialized# :: forall (s :: Type) (n :: GHC.Nat) (a :: TYPE R).
+     Nat# n
+  -> a
+  -> State# s
+  -> (# State# s, MutableVector# s n a #)
+initialized# !(Nat# n) a s0 = case A.initialized# n a s0 of
+  (# s1, x #) -> (# s1, MutableVector# x #)
+
 write :: forall (s :: Type) (n :: GHC.Nat) (a :: TYPE R).
      MutableVector s n a
   -> Fin# n -- index
@@ -213,7 +223,12 @@ thawSlice _ (Vector (Vector# v)) (Nat# off) (Nat# len) = ST $ \s0 ->
     (# s1, mv #) -> (# s1, MutableVector (MutableVector# mv) #)
 
 substitute :: (m :=:# n) -> Vector m a -> Vector n a
-substitute !_ (Vector (Vector# x)) = Vector (Vector# x)
+{-# inline substitute #-}
+substitute _ (Vector (Vector# x)) = Vector (Vector# x)
+
+substitute# :: (m :=:# n) -> Vector# m a -> Vector# n a
+{-# inline substitute# #-}
+substitute# _ (Vector# x) = Vector# x
 
 -- | Tell the type system that a vector has a certain length
 --   without proving it.

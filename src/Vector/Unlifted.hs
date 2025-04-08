@@ -18,7 +18,9 @@ module Vector.Unlifted
   , index
   , unlift
   , substitute
+  , substitute#
   , initialized
+  , initialized#
   , unsafeCoerceLength
   , empty#
     -- * Ranges
@@ -36,6 +38,7 @@ module Vector.Unlifted
   , traverse_
   , itraverse_
   , itraverse_#
+  , traverseST#
   , foldlM
   , foldr
   , ifoldl'
