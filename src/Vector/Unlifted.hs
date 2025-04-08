@@ -41,6 +41,7 @@ module Vector.Unlifted
   , traverseST#
   , foldlM
   , foldr
+  , foldrZip
   , ifoldl'
   , ifoldlSlice'
   , replicate
