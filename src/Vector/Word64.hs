@@ -36,6 +36,8 @@ module Vector.Word64
   , unsafeFreeze
   , freeze
   , freezeSlice
+  , freeze#
+  , freezeSlice#
     -- * Copy
   , thaw
     -- * Composite

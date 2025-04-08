@@ -49,6 +49,7 @@ module Vector
   , C.expose
   , C.expose#
   , C.freezeSlice
+  , C.freezeSlice#
     -- * Ranges
   , set
   , C.setSlice
@@ -56,6 +57,7 @@ module Vector
   , C.unsafeShrinkFreeze
   , C.unsafeFreeze
   , freeze
+  , freeze#
     -- * Copy
   , thaw
   , C.thawSlice
@@ -332,6 +334,14 @@ freeze ::
   -> ST s (Vector n a)
 {-# inline freeze #-}
 freeze n mv = C.freezeSlice (Lte.reflexive# (# #)) mv (Nat.zero# (# #)) n
+
+freeze# :: 
+     Nat# n -- ^ Mutable vector length
+  -> C.MutableVector# s n a -- ^ Mutable vector
+  -> State# s
+  -> (# State# s, Vector# n a #)
+{-# inline freeze# #-}
+freeze# n mv = C.freezeSlice# (Lte.reflexive# (# #)) mv (Nat.zero# (# #)) n
 
 thaw :: 
      Nat# n -- ^ Vector length

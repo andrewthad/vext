@@ -33,6 +33,8 @@ module Vector.Bit
   , unsafeFreeze
   , freeze
   , freezeSlice
+  , freeze#
+  , freezeSlice#
     -- * Copy
   , thaw
     -- * Composite

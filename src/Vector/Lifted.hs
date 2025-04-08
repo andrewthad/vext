@@ -35,6 +35,8 @@ module Vector.Lifted
   , unsafeFreeze
   , freeze
   , freezeSlice
+  , freeze#
+  , freezeSlice#
     -- * Copy
   , thaw
     -- * Composite

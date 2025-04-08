@@ -8,7 +8,6 @@ module Vector.Unlifted
   , MutableVector(..)
   , MutableVector#
   , Bounded(..)
-  , Vector_(..)
   , FromMutability#
     -- * Primitives
   , write#
@@ -22,7 +21,6 @@ module Vector.Unlifted
   , initialized
   , initialized#
   , unsafeCoerceLength
-  , empty#
     -- * Ranges
   , set
   , setSlice
@@ -31,6 +29,8 @@ module Vector.Unlifted
   , unsafeFreeze
   , freeze
   , freezeSlice
+  , freeze#
+  , freezeSlice#
     -- * Copy
   , thaw
     -- * Composite

@@ -56,6 +56,7 @@ module Core
   , copySlice
   , setSlice
   , freezeSlice
+  , freezeSlice#
   , unsafeFreeze
   , unsafeFreeze#
   , thawSlice
@@ -183,9 +184,22 @@ freezeSlice ::
   -> Nat# i
   -> Nat# n
   -> ST s (Vector n a)
+{-# inline freezeSlice #-}
 freezeSlice _ (MutableVector (MutableVector# m)) (Nat# off) (Nat# len) =
   ST \s -> case A.freeze# m off len s of
     (# s', y #) -> (# s', Vector (Vector# y) #)
+
+freezeSlice# ::
+     (i + n <=# m)
+  -> MutableVector# s m a
+  -> Nat# i
+  -> Nat# n
+  -> State# s
+  -> (# State# s, Vector# n a #)
+{-# inline freezeSlice# #-}
+freezeSlice# _ (MutableVector# m) (Nat# off) (Nat# len) s =
+  case A.freeze# m off len s of
+    (# s', y #) -> (# s', Vector# y #)
 
 unsafeFreeze :: forall (s :: Type) (n :: GHC.Nat) (a :: TYPE R).
   MutableVector s n a -> ST s (Vector n a)
