@@ -52,6 +52,8 @@ module Vector.Unlifted
   , construct3
   , construct4
   , construct5
+  , construct6
+  , construct7
   , construct1#
   , construct2#
   , construct3#
