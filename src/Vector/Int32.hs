@@ -61,6 +61,7 @@ module Vector.Int32
   , append
   , clone
   , cloneSlice
+  , copySlice
     -- * Index
   , index0
   , index1

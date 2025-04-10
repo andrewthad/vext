@@ -49,8 +49,6 @@ module Vector.Int64
   , foldr
   , ifoldl'
   , ifoldlSlice'
-  , traverse_
-  , itraverse_
   , replicate
   , empty
   , empty_

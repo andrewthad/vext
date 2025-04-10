@@ -100,6 +100,7 @@ module Vector
   , append
   , clone
   , cloneSlice
+  , C.copySlice
     -- * Index
   , index0
   , index1
