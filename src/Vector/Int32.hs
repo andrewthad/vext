@@ -81,6 +81,7 @@ module Vector.Int32
     -- * Custom
   , cumulativeSum1
   , toFins
+  , weakenFins
     -- * Show
   , show
     -- * Interop with primitive
@@ -97,7 +98,7 @@ import Control.Monad.ST (runST)
 import GHC.Exts (Int32#)
 import GHC.Int (Int(I#),Int32(I32#),Int64(I64#))
 import GHC.TypeNats (type (+))
-import Arithmetic.Types (Nat#,Fin32#)
+import Arithmetic.Types (Nat#,Fin32#,type (<=#))
 import Data.Primitive (ByteArray(ByteArray))
 import Data.Unlifted (PrimArray#(PrimArray#))
 
@@ -136,6 +137,14 @@ toFins ::
 toFins m n !v = if all (\v# -> let w = I32# v# in w >= 0 && fromIntegral @Int32 @Int w < I# (Nat.demote# m)) n v
   then Just (unsafeCoerceVector v)
   else Nothing
+
+weakenFins ::
+     (a <=# b)
+  -> Vector n (Fin32# a)
+  -> Vector n (Fin32# b)
+{-# inline weakenFins #-}
+weakenFins _ (Vector x) = case expose# x of
+  PrimArray# z -> Vector (unsafeConstruct# (PrimArray# z))
 
 -- | Crashes the program if the range is out of bounds. That is,
 -- behavior is always well defined.
