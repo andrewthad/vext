@@ -94,14 +94,19 @@ module Vector.Word8
   , show
     -- * Interop with primitive
   , cloneFromByteArray
+    -- * Interop with bytes
+  , fromByteArrayN
+  , toByteArrayN
   ) where
 
 import Prelude hiding (replicate,map,maximum,Bounded,all,any,elem,show,foldr)
 
 import Arithmetic.Types (Nat#)
-import Data.Primitive (ByteArray)
+import Data.Primitive (ByteArray(ByteArray))
+import Data.Bytes.Types (ByteArrayN(ByteArrayN))
 import GHC.Exts (Word8#)
 import GHC.Word (Word8(W8#))
+import Data.Unlifted (PrimArray#(PrimArray#))
 
 import Vector.Std.Word8
 import Vector.Ord.Word8
@@ -122,3 +127,10 @@ cloneFromByteArray = Vector.Prim.Word8.unsafeCloneFromByteArray
 
 show :: Nat# n -> Vector n Word8# -> String
 show n v = liftShows (\i s -> shows (W8# i) s) n v ""
+
+fromByteArrayN :: ByteArrayN n -> Vector n Word8#
+fromByteArrayN (ByteArrayN (ByteArray x)) = Vector (unsafeConstruct# (PrimArray# x))
+
+toByteArrayN :: Vector n Word8# -> ByteArrayN n
+toByteArrayN (Vector x) = case expose# x of
+  PrimArray# y -> ByteArrayN (ByteArray y)
