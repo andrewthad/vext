@@ -271,7 +271,11 @@ library inst
     , Vector.Zip.Unlifted.Word32.Lifted
     , Vector.Zip.Unlifted.Lifted.Lifted
     , Vector.Zip.Word16.Lifted.Lifted
+    , Vector.Zip.Lifted.Word64.Lifted
+    , Vector.Zip.Lifted.Word32.Lifted
     , Vector.Zip.Lifted.Word16.Lifted
+    , Vector.Zip.Lifted.Word8.Lifted
+    , Vector.Zip.Lifted.Int8.Lifted
     , Vector.Zip.Bit.Bit.Bit
     , Vector.Prim.Int8
     , Vector.Prim.Int32
@@ -309,8 +313,16 @@ library inst
     vext:mask-indef (MaskVector as Vector.Masked.Unlifted) requires (Element as Unlifted, Rep as Unlifted),
     vext:zip-indef (ZipVector as Vector.Zip.Bit.Bit.Bit) requires
       (ElementA as Word1, RepA as Word1, ElementB as Word1, RepB as Word1, ElementC as Word1, RepC as Word1),
+    vext:zip-indef (ZipVector as Vector.Zip.Lifted.Int8.Lifted) requires
+      (ElementA as Lifted, RepA as Lifted, ElementB as Int8, RepB as Int8, ElementC as Lifted, RepC as Lifted),
+    vext:zip-indef (ZipVector as Vector.Zip.Lifted.Word8.Lifted) requires
+      (ElementA as Lifted, RepA as Lifted, ElementB as Word8, RepB as Word8, ElementC as Lifted, RepC as Lifted),
     vext:zip-indef (ZipVector as Vector.Zip.Lifted.Word16.Lifted) requires
       (ElementA as Lifted, RepA as Lifted, ElementB as Word16, RepB as Word16, ElementC as Lifted, RepC as Lifted),
+    vext:zip-indef (ZipVector as Vector.Zip.Lifted.Word32.Lifted) requires
+      (ElementA as Lifted, RepA as Lifted, ElementB as Word32, RepB as Word32, ElementC as Lifted, RepC as Lifted),
+    vext:zip-indef (ZipVector as Vector.Zip.Lifted.Word64.Lifted) requires
+      (ElementA as Lifted, RepA as Lifted, ElementB as Word64, RepB as Word64, ElementC as Lifted, RepC as Lifted),
     vext:zip-indef (ZipVector as Vector.Zip.Unlifted.Word32.Lifted) requires
       (ElementA as Unlifted, RepA as Unlifted, ElementB as Word32, RepB as Word32, ElementC as Lifted, RepC as Lifted),
     vext:zip-indef (ZipVector as Vector.Zip.Unlifted.Lifted.Lifted) requires
@@ -469,7 +481,11 @@ library
     , Vector.Zip.Unlifted.Word32.Lifted
     , Vector.Zip.Unlifted.Lifted.Lifted
     , Vector.Zip.Word16.Lifted.Lifted
+    , Vector.Zip.Lifted.Int8.Lifted
+    , Vector.Zip.Lifted.Word8.Lifted
     , Vector.Zip.Lifted.Word16.Lifted
+    , Vector.Zip.Lifted.Word32.Lifted
+    , Vector.Zip.Lifted.Word64.Lifted
   exposed-modules:
     Vector.Bit
     Vector.Word
