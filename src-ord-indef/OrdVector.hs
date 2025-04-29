@@ -24,16 +24,20 @@ module OrdVector
   , maximum
   , maximumSlice
   , maximumSliceInitial
+    -- * Minimum
+  , minimum
+  , minimumSlice
+  , minimumSliceInitial
     -- * Bubble Sort
   , bubbleSort
   , bubbleSortSlice
   , bubbleSortSliceInPlace
   ) where
 
-import Prelude hiding (Bounded,max,min,maximum)
+import Prelude hiding (Bounded,max,min,maximum,minimum)
 
 import EqVector (equals)
-import Rep (R,eq,max)
+import Rep (R,eq,max,min)
 import Vector (MutableVector(MutableVector),MutableVector#,Vector,Bounded(Bounded),index,write,write#,thaw,read#,unsafeShrinkFreeze,unsafeFreeze,thawSlice)
 import GHC.ST (ST(ST),runST)
 import Arithmetic.Types (type (<),Fin(Fin),Nat#)
@@ -90,6 +94,13 @@ maximum :: forall (n :: GHC.Nat) (a :: TYPE R).
   -> a
 maximum n lt v = maximumSlice (Lte.reflexive# (# #)) lt v (Nat.zero# (# #)) n
 
+minimum :: forall (n :: GHC.Nat) (a :: TYPE R).
+     Nat# n
+  -> (0 <# n)
+  -> Vector n a
+  -> a
+minimum n lt v = minimumSlice (Lte.reflexive# (# #)) lt v (Nat.zero# (# #)) n
+
 -- | Take the maximum element in a slice. The slice must not be empty.
 -- This is enforced by the type system.
 maximumSlice :: forall (i :: GHC.Nat) (m :: GHC.Nat) (n :: GHC.Nat) (a :: TYPE R).
@@ -100,6 +111,19 @@ maximumSlice :: forall (i :: GHC.Nat) (m :: GHC.Nat) (n :: GHC.Nat) (a :: TYPE R
   -> Nat# n
   -> a
 maximumSlice lte zlt v off0 n = maximumSliceInitial lte
+  (index v (Fin.construct# (Lt.transitiveNonstrictR# zlt (Lte.decrementL# @i (Lte.weakenL# @i lte))) (Nat.zero# (# #))))
+  v off0 n
+
+-- | Take the minimum element in a slice. The slice must not be empty.
+-- This is enforced by the type system.
+minimumSlice :: forall (i :: GHC.Nat) (m :: GHC.Nat) (n :: GHC.Nat) (a :: TYPE R).
+     (i + n <=# m)
+  -> (0 <# n)
+  -> Vector m a
+  -> Nat# i
+  -> Nat# n
+  -> a
+minimumSlice lte zlt v off0 n = minimumSliceInitial lte
   (index v (Fin.construct# (Lt.transitiveNonstrictR# zlt (Lte.decrementL# @i (Lte.weakenL# @i lte))) (Nat.zero# (# #))))
   v off0 n
 
@@ -125,6 +149,29 @@ maximumSliceInitial lte b0 !v off0 n = go off0 b0
     Just lt -> go
       (Nat.succ# m)
       (max b (index v (Fin.construct# (Lt.transitiveNonstrictR# (Lt.unlift lt) lte) m)))
+
+-- | Take the minimum element in a slice. This does not require
+-- the slice to be non-null. It takes an additional argument to
+-- use as the initial accumulator.
+minimumSliceInitial :: forall (i :: GHC.Nat) (m :: GHC.Nat) (n :: GHC.Nat) (a :: TYPE R).
+     (i + n <=# m)
+  -> a -- initial minimum element
+  -> Vector m a
+  -> Nat# i
+  -> Nat# n
+  -> a
+{-# noinline minimumSliceInitial #-}
+minimumSliceInitial lte b0 !v off0 n = go off0 b0
+  where
+  end :: Nat# (i + n)
+  end = Nat.plus# off0 n
+  go :: forall k. Nat# k -> a -> a
+  {-# noinline go #-}
+  go !m !b = case Nat.lift m <? Nat.lift end of
+    Nothing -> b
+    Just lt -> go
+      (Nat.succ# m)
+      (min b (index v (Fin.construct# (Lt.transitiveNonstrictR# (Lt.unlift lt) lte) m)))
 
 bubbleSort ::
      Nat# n

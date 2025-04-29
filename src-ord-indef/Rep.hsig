@@ -13,3 +13,4 @@ eq :: forall (a :: TYPE R). a -> a -> Bool
 lt# :: forall (a :: TYPE R). a -> a -> Int#
 gt# :: forall (a :: TYPE R). a -> a -> Int#
 max :: forall (a :: TYPE R). a -> a -> a
+min :: forall (a :: TYPE R). a -> a -> a

@@ -68,6 +68,9 @@ module Vector.Int64
   , maximum
   , maximumSlice
   , maximumSliceInitial
+  , minimum
+  , minimumSlice
+  , minimumSliceInitial
   , bubbleSort
   , bubbleSortSlice
   , bubbleSortSliceInPlace
@@ -78,7 +81,7 @@ module Vector.Int64
   , cloneFromByteArray
   ) where
 
-import Prelude hiding (replicate,map,maximum,Bounded,all,foldr,show)
+import Prelude hiding (replicate,map,maximum,Bounded,all,foldr,show,minimum)
 
 import Arithmetic.Types (Nat#)
 import Data.Primitive (ByteArray)

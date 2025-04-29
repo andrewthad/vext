@@ -31,11 +31,12 @@ module Word8
   , gt#
   , eq#
   , max
+  , min
     -- Metadata
   , size
   ) where
 
-import Prelude hiding (max)
+import Prelude hiding (max,min)
 
 import GHC.Exts
 import Data.Kind (Type)
@@ -144,6 +145,10 @@ copy# (MutablePrimArray# m) doff (PrimArray# v) soff len s0 =
 max :: forall (a :: TYPE R). a -> a -> a
 {-# inline max #-}
 max x y = if gt x y then x else y
+
+min :: forall (a :: TYPE R). a -> a -> a
+{-# inline min #-}
+min x y = if gt x y then y else x
 
 lt :: forall (a :: TYPE R). a -> a -> Bool
 {-# inline lt #-}
