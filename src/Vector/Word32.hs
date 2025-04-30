@@ -74,6 +74,9 @@ module Vector.Word32
   , maximum
   , maximumSlice
   , maximumSliceInitial
+  , minimum
+  , minimumSlice
+  , minimumSliceInitial
   , bubbleSort
   , bubbleSortSlice
   , bubbleSortSliceInPlace
@@ -84,7 +87,7 @@ module Vector.Word32
   , cloneFromByteArray
   ) where
 
-import Prelude hiding (replicate,map,maximum,Bounded,all,any,elem,show)
+import Prelude hiding (replicate,map,maximum,Bounded,all,any,elem,show,minimum)
 
 import Arithmetic.Types (Nat#)
 import Data.Primitive (ByteArray)
