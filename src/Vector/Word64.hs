@@ -1,7 +1,8 @@
+{-# language BangPatterns #-}
 {-# language DataKinds #-}
 {-# language MagicHash #-}
 {-# language NumericUnderscores #-}
-{-# language BangPatterns #-}
+{-# language ScopedTypeVariables #-}
 {-# language TypeApplications #-}
 {-# language TypeOperators #-}
 
@@ -55,6 +56,7 @@ module Vector.Word64
   , append
   , clone
   , cloneSlice
+  , sum
     -- * Index
   , index0
   , index1
@@ -78,7 +80,7 @@ module Vector.Word64
   , cloneFromByteArray
   ) where
 
-import Prelude hiding (replicate,map,maximum,Bounded,all,elem,show)
+import Prelude hiding (replicate,map,maximum,Bounded,all,elem,show,sum)
 
 import Arithmetic.Types (Nat#)
 import Data.Primitive (ByteArray)
@@ -89,6 +91,7 @@ import Vector.Std.Word64
 import Vector.Eq.Word64
 import Vector.Ord.Word64
 
+import qualified GHC.Exts as Exts
 import qualified Vector.Prim.Word64
 
 -- | Crashes the program if the range is out of bounds. That is,
@@ -104,3 +107,13 @@ cloneFromByteArray = Vector.Prim.Word64.unsafeCloneFromByteArray
 
 show :: Nat# n -> Vector n Word64# -> String
 show n v = liftShows (\i s -> shows (W64# i) s) n v ""
+
+sum :: Nat# n -> Vector n Word64# -> Word64#
+{-# noinline sum #-}
+sum n !v =
+  let !(W64# result) = ifoldl'
+        (\(W64# acc) _ (x :: Word64#) -> W64# (Exts.plusWord64# acc x))
+        (W64# (Exts.wordToWord64# 0##))
+        n
+        v
+   in result
