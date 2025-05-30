@@ -273,6 +273,7 @@ library inst
     , Vector.Zip.Unlifted.Word32.Lifted
     , Vector.Zip.Unlifted.Lifted.Lifted
     , Vector.Zip.Word16.Lifted.Lifted
+    , Vector.Zip.Lifted.Lifted.Lifted
     , Vector.Zip.Lifted.Word64.Lifted
     , Vector.Zip.Lifted.Word32.Lifted
     , Vector.Zip.Lifted.Word16.Lifted
@@ -324,6 +325,8 @@ library inst
       (ElementA as Lifted, RepA as Lifted, ElementB as Word8, RepB as Word8, ElementC as Lifted, RepC as Lifted),
     vext:zip-indef (ZipVector as Vector.Zip.Lifted.Word16.Lifted) requires
       (ElementA as Lifted, RepA as Lifted, ElementB as Word16, RepB as Word16, ElementC as Lifted, RepC as Lifted),
+    vext:zip-indef (ZipVector as Vector.Zip.Lifted.Lifted.Lifted) requires
+      (ElementA as Lifted, RepA as Lifted, ElementB as Lifted, RepB as Lifted, ElementC as Lifted, RepC as Lifted),
     vext:zip-indef (ZipVector as Vector.Zip.Lifted.Word32.Lifted) requires
       (ElementA as Lifted, RepA as Lifted, ElementB as Word32, RepB as Word32, ElementC as Lifted, RepC as Lifted),
     vext:zip-indef (ZipVector as Vector.Zip.Lifted.Word64.Lifted) requires
