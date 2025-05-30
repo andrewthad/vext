@@ -495,6 +495,7 @@ library
     , Vector.Zip.Unlifted.Word32.Lifted
     , Vector.Zip.Unlifted.Lifted.Lifted
     , Vector.Zip.Word16.Lifted.Lifted
+    , Vector.Zip.Lifted.Lifted.Lifted
     , Vector.Zip.Lifted.Int8.Lifted
     , Vector.Zip.Lifted.Int64.Lifted
     , Vector.Zip.Lifted.Word8.Lifted
