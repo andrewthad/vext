@@ -62,6 +62,8 @@ module Vector
   , thaw
   , C.thawSlice
     -- * Composite
+  , cons
+  , snoc
   , replaceAt
   , empty_
   , map
@@ -567,4 +569,18 @@ replaceAt :: Nat# n -> Vector n a -> Fin# n -> a -> Vector n a
 replaceAt n !v ix a = runST $ do
   dst <- thaw n v
   write dst ix a
+  unsafeFreeze dst
+
+cons :: forall n a. Nat# n -> Vector n a -> a -> Vector (n + 1) a
+{-# inline cons #-}
+cons n !v a = runST $ do
+  dst <- C.initialized (Nat.succ# n) a
+  C.copySlice (Lte.substituteL# (Plus.commutative# @n @1 (# #)) (Lte.reflexive# @(n + 1) (# #))) (Lte.reflexive# (# #)) dst N1# v N0# n
+  unsafeFreeze dst
+
+snoc :: forall n a. Nat# n -> Vector n a -> a -> Vector (n + 1) a
+{-# inline snoc #-}
+snoc n !v a = runST $ do
+  dst <- C.initialized (Nat.succ# n) a
+  C.copySlice (Lte.weakenR# @1 (Lte.reflexive# @n (# #))) (Lte.reflexive# @n (# #)) dst N0# v N0# n
   unsafeFreeze dst

@@ -31,6 +31,8 @@ module Vector.Int
     -- * Copy
   , thaw
     -- * Composite
+  , cons
+  , snoc
   , replaceAt
   , findIndex
   , map

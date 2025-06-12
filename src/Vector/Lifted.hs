@@ -40,6 +40,8 @@ module Vector.Lifted
     -- * Copy
   , thaw
     -- * Composite
+  , cons
+  , snoc
   , replaceAt
   , any
   , all
