@@ -1,6 +1,6 @@
 cabal-version: 3.4
 name: vext
-version: 0.1.7.0
+version: 0.1.8.0
 synopsis: Array library monomorphized with backpack
 bug-reports: https://github.com/andrewthad/vex-unified/issues
 license: BSD-3-Clause
@@ -29,7 +29,7 @@ library indef
     Rep
   build-depends:
     , base >=4.12.0.0 && <5
-    , natural-arithmetic
+    , natural-arithmetic >=0.2.3
     , unlifted
     , vext:types
   hs-source-dirs: src-indef
@@ -41,7 +41,7 @@ library prim-indef
     PrimVector
   build-depends:
     , base >=4.12.0.0 && <5
-    , natural-arithmetic
+    , natural-arithmetic >=0.2.3
     , unlifted
     , primitive >=0.9
     , vext:indef
@@ -57,7 +57,7 @@ library map-indef
     MapVector
   build-depends:
     , base >=4.12.0.0 && <5
-    , natural-arithmetic
+    , natural-arithmetic >=0.2.3
     , unlifted
     , vext:indef
   mixins:
@@ -74,7 +74,7 @@ library zip-indef
     ZipVector
   build-depends:
     , base >=4.12.0.0 && <5
-    , natural-arithmetic
+    , natural-arithmetic >=0.2.3
     , unlifted
     , vext:indef
   mixins:
@@ -97,7 +97,7 @@ library type-eq-indef
     Type
   build-depends:
     , base >=4.12.0.0 && <5
-    , natural-arithmetic
+    , natural-arithmetic >=0.2.3
     , unlifted
     , vext:indef
   hs-source-dirs: src-type-eq-indef
@@ -112,7 +112,7 @@ library rep-eq-indef
     Rep
   build-depends:
     , base >=4.12.0.0 && <5
-    , natural-arithmetic
+    , natural-arithmetic >=0.2.3
     , unlifted
     , vext:indef
   hs-source-dirs: src-rep-eq-indef
@@ -127,7 +127,7 @@ library ord-indef
     Rep
   build-depends:
     , base >=4.12.0.0 && <5
-    , natural-arithmetic
+    , natural-arithmetic >=0.2.3
     , unlifted
     , vext:indef
     , vext:inst-bit
@@ -144,7 +144,7 @@ library mask-indef
     Rep
   build-depends:
     , base >=4.12.0.0 && <5
-    , natural-arithmetic
+    , natural-arithmetic >=0.2.3
     , unlifted
     , vext:indef
     , vext:inst-bit
@@ -163,7 +163,7 @@ library permute-indef
     FinType
   build-depends:
     , base >=4.12.0.0 && <5
-    , natural-arithmetic
+    , natural-arithmetic >=0.2.3
     , unlifted
     , vext:indef
     , vext:inst
@@ -530,7 +530,7 @@ library
     Vector.Types
   build-depends:
     , base >=4.12.0.0 && <5 
-    , natural-arithmetic
+    , natural-arithmetic >=0.2.3
     , primitive >=0.8
     , run-st >=0.1.3
     , transformers >=0.6.1
@@ -553,5 +553,5 @@ test-suite test
     , vext
     , tasty >=1.2.3
     , tasty-quickcheck >=0.10
-    , natural-arithmetic
+    , natural-arithmetic >=0.2.3
     , unlifted
