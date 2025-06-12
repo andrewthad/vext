@@ -62,6 +62,7 @@ module Vector
   , thaw
   , C.thawSlice
     -- * Composite
+  , replaceAt
   , empty_
   , map
   , all
@@ -560,3 +561,10 @@ findIndex f !n !v = go Nat.N0#
             then MaybeFinJust# fin
             else go (Nat.succ# ix)
     _ -> MaybeFinNothing#
+
+replaceAt :: Nat# n -> Vector n a -> Fin# n -> a -> Vector n a
+{-# inline replaceAt #-}
+replaceAt n !v ix a = runST $ do
+  dst <- thaw n v
+  write dst ix a
+  unsafeFreeze dst

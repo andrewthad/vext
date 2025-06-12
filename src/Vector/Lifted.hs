@@ -40,6 +40,7 @@ module Vector.Lifted
     -- * Copy
   , thaw
     -- * Composite
+  , replaceAt
   , any
   , all
   , findIndex
