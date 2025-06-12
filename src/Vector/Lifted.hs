@@ -40,6 +40,7 @@ module Vector.Lifted
     -- * Copy
   , thaw
     -- * Composite
+  , tail
   , cons
   , snoc
   , replaceAt
@@ -98,7 +99,7 @@ module Vector.Lifted
   , length
   ) where
 
-import Prelude hiding (replicate,map,all,any,read,Bounded,foldr,length)
+import Prelude hiding (replicate,map,all,any,read,Bounded,foldr,length,tail,init,head)
 import Vector.Std.Lifted
 
 import Control.Monad.Trans.Class (lift)

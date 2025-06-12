@@ -62,6 +62,7 @@ module Vector
   , thaw
   , C.thawSlice
     -- * Composite
+  , tail
   , cons
   , snoc
   , replaceAt
@@ -116,7 +117,7 @@ module Vector
   , index8
   ) where
 
-import Prelude hiding (read,map,Bounded,replicate,all,any,foldr)
+import Prelude hiding (read,map,Bounded,replicate,all,any,foldr,tail,head,init)
 
 import Types (Mutability(Mutable,Immutable))
 import Core (Vector(..),Vector#,MutableVector(..),unsafeFreeze,index,write)
@@ -583,4 +584,10 @@ snoc :: forall n a. Nat# n -> Vector n a -> a -> Vector (n + 1) a
 snoc n !v a = runST $ do
   dst <- C.initialized (Nat.succ# n) a
   C.copySlice (Lte.weakenR# @1 (Lte.reflexive# @n (# #))) (Lte.reflexive# @n (# #)) dst N0# v N0# n
+  unsafeFreeze dst
+
+tail :: forall n a. Nat# n -> Vector (n + 1) a -> Vector n a
+{-# inline tail #-}
+tail n v = runST $ do
+  dst <- C.thawSlice (Lte.substituteL# (Plus.commutative# @n @1 (# #)) (Lte.reflexive# @(n + 1) (# #))) v N1# n
   unsafeFreeze dst
