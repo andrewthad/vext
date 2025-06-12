@@ -94,9 +94,11 @@ module Vector.Lifted
   , toList
     -- * Hide Length
   , vector_
+    -- * Recover Length
+  , length
   ) where
 
-import Prelude hiding (replicate,map,all,any,read,Bounded,foldr)
+import Prelude hiding (replicate,map,all,any,read,Bounded,foldr,length)
 import Vector.Std.Lifted
 
 import Control.Monad.Trans.Class (lift)
@@ -111,6 +113,7 @@ import GHC.Exts (Int(I#))
 import GHC.ST (ST(ST))
 import Arithmetic.Nat (pattern N0#)
 
+import qualified Prelude
 import qualified GHC.Exts as Exts
 import qualified GHC.TypeNats as GHC
 import qualified Arithmetic.Nat as Nat
@@ -127,6 +130,10 @@ with (SmallArray xs) f =
 toSmallArray :: Vector n a -> SmallArray a
 {-# inline toSmallArray #-}
 toSmallArray !v = SmallArray (expose v)
+
+length :: Vector n a -> Nat# n
+{-# inline length #-}
+length !v = Nat# (Exts.sizeofSmallArray# (expose v))
 
 toList :: Vector n a -> [a]
 {-# inline toList #-}
@@ -163,7 +170,7 @@ fromList :: [a] -> Vector_ a
 fromList xs0 = case xs0 of
   [] -> empty_
   a0 : _ -> runST $ do
-    let !(I# len) = length xs0
+    let !(I# len) = Prelude.length xs0
     Nat.with# len $ \sz -> do
       dst <- initialized sz a0
       _ <- Fin.ascendM# sz xs0 $ \ix payload -> case payload of
