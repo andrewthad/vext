@@ -1,3 +1,4 @@
+{-# language BangPatterns #-}
 {-# language MagicHash #-}
 {-# language RankNTypes #-}
 
@@ -83,14 +84,24 @@ module Vector.Int
   , unsafeCoerceVector
     -- * Hide Length
   , vector_
+    -- * Recover Length
+  , length
   ) where
 
-import Prelude ()
+import Prelude (undefined)
 
-import Vector.Std.Int
-import Vector.Ord.Int
-import Vector.Eq.Int
-import Data.Primitive (SmallArray(SmallArray))
 import Arithmetic.Unsafe (Nat#(Nat#))
+import Data.Unlifted (PrimArray#(PrimArray#))
+import Foreign.Storable (sizeOf)
+import GHC.Int (Int)
+import Vector.Eq.Int
+import Vector.Ord.Int
+import Vector.Std.Int
 
 import qualified GHC.Exts as Exts
+
+length :: Vector n a -> Nat# n
+{-# inline length #-}
+length !v = case expose v of
+  PrimArray# x -> case (sizeOf (undefined :: Int)) of
+    Exts.I# i -> Nat# (Exts.quotInt# (Exts.sizeofByteArray# x) i)
