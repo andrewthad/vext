@@ -22,11 +22,8 @@ import GHC.Exts (ByteArray#)
 import Prelude hiding (concat)
 import Arithmetic.Types (Nat#)
 import Vector.Unlifted (Vector)
-import Data.Primitive (ByteArray(ByteArray))
-import Control.Monad.ST.Run (runByteArrayST)
 import Data.Unlifted (ShortText#(ShortText#))
 
-import qualified Data.Primitive as PM
 import qualified Vector.Unlifted as V
 import qualified Vector.Unlifted.ByteArray as VUB
 

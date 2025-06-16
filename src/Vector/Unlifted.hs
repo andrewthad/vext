@@ -34,6 +34,13 @@ module Vector.Unlifted
     -- * Copy
   , thaw
     -- * Composite
+  , tail
+  , cons
+  , snoc
+  , replaceAt
+  , any
+  , all
+  , findIndex
   , map
   , traverse_
   , itraverse_
