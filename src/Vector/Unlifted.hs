@@ -46,6 +46,7 @@ module Vector.Unlifted
   , itraverse_
   , itraverse_#
   , traverseST#
+  , generateST#
   , foldlM
   , foldr
   , foldrZip

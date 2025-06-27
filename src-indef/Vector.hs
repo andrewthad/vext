@@ -71,6 +71,7 @@ module Vector
   , all
   , any
   , findIndex
+  , generateST#
   , traverse_
   , traverseZip_
   , traverseST#
@@ -247,6 +248,25 @@ traverseZip_ :: forall (n :: GHC.Nat) (m :: Type -> Type) (a :: TYPE R) (b :: TY
 traverseZip_ f n v w = Fin.ascendM_# n
   (\fin -> f (index v fin) (index w fin)
   )
+
+generateST# :: forall (n :: GHC.Nat) (s :: Type) (a :: TYPE R).
+     (Fin# n -> State# s -> (# State# s, a #))
+  -> Nat# n
+  -> State# s
+  -> (# State# s, Vector# n a #)
+{-# inline generateST# #-}
+generateST# f n s0 = case Nat.testZero# n of
+  LeftVoid# zeq -> (# s0, C.substitute# zeq (C.empty# (# #)) #)
+  RightVoid# zlt ->
+    let !(# s1, b0 #) = f (Fin.construct# zlt Nat.N0#) s0 in
+    let !(# s2, dst #) = C.initialized# n b0 s1 in
+    let go :: forall p. Nat# p -> State# s -> (# State# s, Vector# n a #)
+        go m t0 = case m <?# n of
+          JustVoid# lt -> case f (Fin.construct# lt m) t0 of
+            (# t1, e #) -> case C.write# dst (Fin.construct# lt m) e t1 of
+              t2 -> go (Nat.succ# m) t2
+          _ -> C.unsafeFreeze# dst t0
+     in go Nat.N1# s2
 
 traverseST# :: forall (n :: GHC.Nat) (s :: Type) (a :: TYPE R) (b :: TYPE R).
      (a -> State# s -> (# State# s, b #))
