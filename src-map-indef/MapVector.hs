@@ -16,6 +16,7 @@
 
 module MapVector
   ( map
+  , map#
   ) where
 
 import Prelude hiding (map)
@@ -39,3 +40,8 @@ map f n !v = case Nat.testZero# n of
         B.write dst fin (f (A.index v fin))
       )
     B.unsafeFreeze dst
+
+map# :: (a -> b) -> Nat# n -> A.Vector# n a -> B.Vector# n b
+{-# inline map# #-}
+map# f n xs = case map f n (A.Vector xs) of
+  B.Vector b -> b
