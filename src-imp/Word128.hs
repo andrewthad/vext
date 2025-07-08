@@ -24,6 +24,11 @@ module Word128
   , thaw#
   , freeze#
   , copy#
+    -- Primitive
+  , size
+    -- Comparison
+  , eq
+  , eq#
   ) where
 
 import GHC.Exts
@@ -47,6 +52,18 @@ unsafeToW128 x = unsafeCoerce# x
 
 empty# :: forall (a :: TYPE R). (# #) -> A# a
 empty# = emptyPrimArray#
+
+eq# :: forall (a :: TYPE R). a -> a -> Int#
+{-# inline eq# #-}
+eq# x y = case unsafeToW128 x of
+  (# x1, x2 #) -> case unsafeToW128 y of
+    (# y1, y2 #) -> case eqWord64# x1 y1 of
+      1# -> eqWord64# x2 y2
+      _ -> 0#
+
+eq :: forall (a :: TYPE R). a -> a -> Bool
+{-# inline eq #-}
+eq x y = isTrue# (eq# x y)
 
 thaw# :: forall (s :: Type) (a :: TYPE R).
      A# a
@@ -151,3 +168,6 @@ write# (MutablePrimArray# arr#) i# x s0 = case unsafeToW128 x of
     s1 -> case Exts.writeWord64Array# arr# (2# *# i#) b s1 of
       s2 -> s2
 #endif
+
+size :: Int 
+size = 16
