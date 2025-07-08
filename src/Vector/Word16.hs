@@ -51,6 +51,7 @@ module Vector.Word16
   , ifoldlSlice'
   , replicate
   , empty
+  , empty#
   , empty_
   , construct1
   , construct3

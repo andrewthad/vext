@@ -56,6 +56,7 @@ module Vector.Word8
   , foldrZip
   , replicate
   , empty
+  , empty#
   , empty_
   , construct1
   , construct3

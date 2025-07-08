@@ -51,6 +51,7 @@ module Vector.Int64
   , ifoldlSlice'
   , replicate
   , empty
+  , empty#
   , empty_
   , construct3
   , construct4

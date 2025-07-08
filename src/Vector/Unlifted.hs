@@ -55,6 +55,7 @@ module Vector.Unlifted
   , replicate
   , empty
   , empty#
+  , empty_
   , construct1
   , construct2
   , construct3
