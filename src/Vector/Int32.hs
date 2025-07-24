@@ -1,9 +1,12 @@
+{-# language BangPatterns #-}
 {-# language DataKinds #-}
 {-# language MagicHash #-}
 {-# language NumericUnderscores #-}
-{-# language BangPatterns #-}
+{-# language PatternSynonyms #-}
+{-# language ScopedTypeVariables #-}
 {-# language TypeApplications #-}
 {-# language TypeOperators #-}
+{-# language UnboxedTuples #-}
 
 module Vector.Int32
   ( -- Types
@@ -83,6 +86,7 @@ module Vector.Int32
   , toFins
   , fromFins
   , weakenFins
+  , ascendingFins
     -- * Show
   , show
     -- * Interop with primitive
@@ -95,11 +99,14 @@ import Vector.Std.Int32
 import Vector.Ord.Int32
 import Vector.Eq.Int32
 
-import Control.Monad.ST (runST)
+import Control.Monad.ST (ST,runST)
 import GHC.Exts (Int32#)
 import GHC.Int (Int(I#),Int32(I32#),Int64(I64#))
 import GHC.TypeNats (type (+))
-import Arithmetic.Types (Nat#,Fin32#,type (<=#))
+import Arithmetic.Types (Nat#,Fin32#,type (<=#),pattern MaybeFin32Just#)
+import Arithmetic.Nat ((<?#),(<=?#),pattern N0#)
+import Data.Maybe.Void (pattern JustVoid#)
+import Data.Either.Void (pattern LeftVoid#, pattern RightVoid#)
 import Data.Primitive (ByteArray(ByteArray))
 import Data.Unlifted (PrimArray#(PrimArray#))
 
@@ -129,6 +136,24 @@ cumulativeSum1 n !v = runST $ do
             pure acc1
     )
   unsafeFreeze dst
+
+ascendingFins :: forall n.
+     Nat# n
+  -> Vector n (Fin32# n)
+{-# noinline ascendingFins #-}
+ascendingFins n = case n <=?# Nat.constant# @2147483648 (# #) of
+  JustVoid# lte -> case Nat.testZero# n of
+    LeftVoid# zeqn -> substitute zeqn empty
+    RightVoid# zltn -> runST $ do
+      let !zeroFin = Fin.construct32# lte zltn N0#
+      dst <- initialized n zeroFin
+      let go (ix :: Fin32# n) = do
+            write dst (Fin.nativeFrom32# ix) ix
+            case Fin.succ32# lte n ix of
+              MaybeFin32Just# ix' -> go ix'
+              _ -> unsafeFreeze dst
+      go zeroFin
+  _ -> errorWithoutStackTrace "Vector.Int32.ascendingFins: 32-bit finite numbers cannot be >= 2^31"
 
 -- | Convert a vector of Fin32 into a vector of Int32. This is a no-op
 -- since it just forgets the information about the upper bound.
