@@ -81,6 +81,7 @@ module Vector.Int32
     -- * Custom
   , cumulativeSum1
   , toFins
+  , fromFins
   , weakenFins
     -- * Show
   , show
@@ -128,6 +129,14 @@ cumulativeSum1 n !v = runST $ do
             pure acc1
     )
   unsafeFreeze dst
+
+-- | Convert a vector of Fin32 into a vector of Int32. This is a no-op
+-- since it just forgets the information about the upper bound.
+fromFins ::
+     Vector n (Fin32# m)
+  -> Vector n Int32#
+{-# inline fromFins #-}
+fromFins = unsafeCoerceVector
 
 toFins :: 
      Nat# m -- ^ upper bound
