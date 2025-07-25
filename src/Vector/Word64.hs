@@ -2,6 +2,7 @@
 {-# language DataKinds #-}
 {-# language MagicHash #-}
 {-# language NumericUnderscores #-}
+{-# language RankNTypes #-}
 {-# language ScopedTypeVariables #-}
 {-# language TypeApplications #-}
 {-# language TypeOperators #-}
@@ -80,11 +81,12 @@ module Vector.Word64
     -- * Interop with primitive
   , cloneFromByteArray
   , toPrimArray
+  , with
   ) where
 
 import Prelude hiding (replicate,map,maximum,Bounded,all,elem,show,sum)
 
-import Arithmetic.Types (Nat#)
+import Arithmetic.Unsafe (Nat#(Nat#))
 import Data.Primitive (ByteArray)
 import GHC.Exts (Word64#)
 import GHC.Word (Word64(W64#))
@@ -109,6 +111,14 @@ cloneFromByteArray ::
   -> Vector n Word64#
 {-# inline cloneFromByteArray #-}
 cloneFromByteArray = Vector.Prim.Word64.unsafeCloneFromByteArray
+
+with ::
+     PrimArray Word64
+  -> (forall n. Nat# n -> Vector n Word64# -> b)
+  -> b
+{-# inline with #-}
+with (PrimArray xs) f =
+  f (Nat# (Exts.quotInt# (Exts.sizeofByteArray# xs) 8# )) (Vector (unsafeConstruct# (PrimArray# xs)))
 
 toPrimArray :: Vector n Word64# -> PrimArray Word64
 {-# inline toPrimArray #-}

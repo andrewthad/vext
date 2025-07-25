@@ -261,6 +261,7 @@ library inst
     , Vector.Map.Word32.Lifted
     , Vector.Map.Word32.Int64
     , Vector.Map.Word64.Lifted
+    , Vector.Map.Word64.Word64
     , Vector.Map.Int.Int
     , Vector.Map.Int8.Lifted
     , Vector.Map.Int16.Lifted
@@ -270,6 +271,7 @@ library inst
     , Vector.Map.Unlifted.Lifted
     , Vector.Map.Lifted.Int32
     , Vector.Map.Lifted.Int64
+    , Vector.Map.Lifted.Word64
     , Vector.Map.Lifted.Lifted
     , Vector.Map.Lifted.Unlifted
     , Vector.Zip.Unlifted.Word32.Lifted
@@ -346,6 +348,8 @@ library inst
       (ElementA as Lifted, RepA as Lifted, ElementB as Int32, RepB as Int32),
     vext:map-indef (MapVector as Vector.Map.Lifted.Int64) requires
       (ElementA as Lifted, RepA as Lifted, ElementB as Int64, RepB as Int64),
+    vext:map-indef (MapVector as Vector.Map.Lifted.Word64) requires
+      (ElementA as Lifted, RepA as Lifted, ElementB as Word64, RepB as Word64),
     vext:map-indef (MapVector as Vector.Map.Lifted.Lifted) requires
       (ElementA as Lifted, RepA as Lifted, ElementB as Lifted, RepB as Lifted),
     vext:map-indef (MapVector as Vector.Map.Lifted.Unlifted) requires
@@ -362,6 +366,8 @@ library inst
       (ElementA as Word32, RepA as Word32, ElementB as Int64, RepB as Int64),
     vext:map-indef (MapVector as Vector.Map.Word64.Lifted) requires
       (ElementA as Word64, RepA as Word64, ElementB as Lifted, RepB as Lifted),
+    vext:map-indef (MapVector as Vector.Map.Word64.Word64) requires
+      (ElementA as Word64, RepA as Word64, ElementB as Word64, RepB as Word64),
     vext:map-indef (MapVector as Vector.Map.Int64.Lifted) requires
       (ElementA as Int64, RepA as Int64, ElementB as Lifted, RepB as Lifted),
     vext:map-indef (MapVector as Vector.Map.Int64.Word32) requires
@@ -486,6 +492,7 @@ library
     , Vector.Std.Word
     , Vector.Map.Lifted.Int32
     , Vector.Map.Lifted.Int64
+    , Vector.Map.Lifted.Word64
     , Vector.Map.Lifted.Lifted
     , Vector.Map.Lifted.Unlifted
     , Vector.Map.Word8.Lifted
@@ -493,6 +500,7 @@ library
     , Vector.Map.Word32.Lifted
     , Vector.Map.Word32.Int64
     , Vector.Map.Word64.Lifted
+    , Vector.Map.Word64.Word64
     , Vector.Map.Int.Int
     , Vector.Map.Int8.Lifted
     , Vector.Map.Int16.Lifted
