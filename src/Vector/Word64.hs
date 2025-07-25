@@ -79,6 +79,7 @@ module Vector.Word64
   , show
     -- * Interop with primitive
   , cloneFromByteArray
+  , toPrimArray
   ) where
 
 import Prelude hiding (replicate,map,maximum,Bounded,all,elem,show,sum)
@@ -91,6 +92,8 @@ import GHC.Word (Word64(W64#))
 import Vector.Std.Word64
 import Vector.Eq.Word64
 import Vector.Ord.Word64
+import Data.Primitive (PrimArray(PrimArray))
+import Data.Unlifted (PrimArray#(PrimArray#))
 
 import qualified GHC.Exts as Exts
 import qualified Vector.Prim.Word64
@@ -104,7 +107,13 @@ cloneFromByteArray ::
   -> Nat# n -- ^ Length of the vector, units are elements, not bytes
   -> ByteArray
   -> Vector n Word64#
+{-# inline cloneFromByteArray #-}
 cloneFromByteArray = Vector.Prim.Word64.unsafeCloneFromByteArray
+
+toPrimArray :: Vector n Word64# -> PrimArray Word64
+{-# inline toPrimArray #-}
+toPrimArray v = case expose v of
+  PrimArray# x -> PrimArray x
 
 show :: Nat# n -> Vector n Word64# -> String
 show n v = liftShows (\i s -> shows (W64# i) s) n v ""
