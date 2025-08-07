@@ -1,4 +1,5 @@
 {-# language BangPatterns #-}
+{-# language UnboxedTuples #-}
 {-# language PatternSynonyms #-}
 {-# language ScopedTypeVariables #-}
 {-# language KindSignatures #-}
@@ -52,6 +53,7 @@ module Vector.Lifted
   , traverseZip_
   , itraverse_
   , traverseST#
+  , traverseIO
   , generate
   , generateST#
   , foldlM
@@ -104,17 +106,18 @@ module Vector.Lifted
 import Prelude hiding (replicate,map,all,any,read,Bounded,foldr,length,tail,init,head)
 import Vector.Std.Lifted
 
-import Control.Monad.Trans.Class (lift)
-import Data.Maybe.Void (pattern JustVoid#)
+import Arithmetic.Nat (pattern N0#)
 import Arithmetic.Types (Fin#)
 import Arithmetic.Unsafe (Nat#(Nat#))
-import Control.Monad.ST (runST)
-import Data.Kind (Type)
+import Control.Monad.ST (runST,stToIO)
+import Control.Monad.Trans.Class (lift)
 import Control.Monad.Trans.Except (throwE,runExceptT)
+import Data.Kind (Type)
+import Data.Maybe.Void (pattern JustVoid#)
 import Data.Primitive (SmallArray(SmallArray))
 import GHC.Exts (Int(I#))
+import GHC.IO (IO(IO))
 import GHC.ST (ST(ST))
-import Arithmetic.Nat (pattern N0#)
 
 import qualified Prelude
 import qualified GHC.Exts as Exts
@@ -188,3 +191,8 @@ equals :: Eq a => Nat# n -> Vector n a -> Vector n a -> Bool
 equals n !xs !ys = foldrZip
   (\x y acc -> x == y && acc
   ) True n xs ys
+
+traverseIO :: (a -> IO b) -> Nat# n -> Vector n a -> IO (Vector n b)
+{-# inline traverseIO #-}
+traverseIO f n (Vector v) = stToIO $ ST $ \s0 -> case traverseST# (\x s -> case f x of {IO g -> g s}) n v s0 of
+  (# s1, v' #) -> (# s1, Vector v' #)
