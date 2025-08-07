@@ -71,6 +71,7 @@ module Vector
   , all
   , any
   , findIndex
+  , generate
   , generateST#
   , traverse_
   , traverseZip_
@@ -126,7 +127,7 @@ import Data.Unlifted (Maybe#(..))
 import Rep (R)
 import Element (A#,M#)
 import GHC.Exts (Int(I#),RuntimeRep(BoxedRep),Levity(Unlifted))
-import GHC.ST (ST,runST)
+import GHC.ST (ST(ST),runST)
 import Data.Kind (Type)
 import GHC.Exts (TYPE,State#,Int#,(*#))
 import Arithmetic.Unsafe (Fin#(Fin#))
@@ -248,6 +249,14 @@ traverseZip_ :: forall (n :: GHC.Nat) (m :: Type -> Type) (a :: TYPE R) (b :: TY
 traverseZip_ f n v w = Fin.ascendM_# n
   (\fin -> f (index v fin) (index w fin)
   )
+
+generate :: 
+     (Fin# n -> a)
+  -> Nat# n
+  -> Vector n a
+{-# inline generate #-}
+generate f n = runST $ ST $ \s0 -> case generateST# (\x s -> (# s, f x #)) n s0 of
+  (# s1, v #) -> (# s1, Vector v #)
 
 generateST# :: forall (n :: GHC.Nat) (s :: Type) (a :: TYPE R).
      (Fin# n -> State# s -> (# State# s, a #))

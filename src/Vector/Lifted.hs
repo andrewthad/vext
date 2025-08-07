@@ -52,6 +52,8 @@ module Vector.Lifted
   , traverseZip_
   , itraverse_
   , traverseST#
+  , generate
+  , generateST#
   , foldlM
   , ifoldl'
   , ifoldlSlice'

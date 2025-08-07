@@ -274,6 +274,7 @@ library inst
     , Vector.Map.Unlifted.Word64
     , Vector.Map.Lifted.Int32
     , Vector.Map.Lifted.Int64
+    , Vector.Map.Lifted.Int
     , Vector.Map.Lifted.Word64
     , Vector.Map.Lifted.Lifted
     , Vector.Map.Lifted.Unlifted
@@ -351,6 +352,8 @@ library inst
       (ElementA as Lifted, RepA as Lifted, ElementB as Int32, RepB as Int32),
     vext:map-indef (MapVector as Vector.Map.Lifted.Int64) requires
       (ElementA as Lifted, RepA as Lifted, ElementB as Int64, RepB as Int64),
+    vext:map-indef (MapVector as Vector.Map.Lifted.Int) requires
+      (ElementA as Lifted, RepA as Lifted, ElementB as Int, RepB as Int),
     vext:map-indef (MapVector as Vector.Map.Lifted.Word64) requires
       (ElementA as Lifted, RepA as Lifted, ElementB as Word64, RepB as Word64),
     vext:map-indef (MapVector as Vector.Map.Lifted.Lifted) requires
@@ -501,6 +504,7 @@ library
     , Vector.Std.Word
     , Vector.Map.Lifted.Int32
     , Vector.Map.Lifted.Int64
+    , Vector.Map.Lifted.Int
     , Vector.Map.Lifted.Word64
     , Vector.Map.Lifted.Lifted
     , Vector.Map.Lifted.Unlifted

@@ -17,10 +17,11 @@
 module MapVector
   ( map
   , map#
+  , imap
   ) where
 
 import Prelude hiding (map)
-import Arithmetic.Types (Nat#)
+import Arithmetic.Types (Nat#,Fin#)
 import Control.Monad.ST (runST)
 import Data.Either.Void (pattern LeftVoid#,pattern RightVoid#)
 
@@ -38,6 +39,18 @@ map f n !v = case Nat.testZero# n of
     Fin.ascendM_# n
       (\fin -> do
         B.write dst fin (f (A.index v fin))
+      )
+    B.unsafeFreeze dst
+
+imap :: (Fin# n -> a -> b) -> Nat# n -> A.Vector n a -> B.Vector n b
+{-# inline imap #-}
+imap f n !v = case Nat.testZero# n of
+  LeftVoid# zeq -> B.substitute zeq B.empty
+  RightVoid# zlt -> runST $ do
+    dst <- B.initialized n (f (Fin.construct# zlt Nat.N0#) (A.index v (Fin.construct# zlt Nat.N0#)))
+    Fin.ascendM_# n
+      (\fin -> do
+        B.write dst fin (f fin (A.index v fin))
       )
     B.unsafeFreeze dst
 
