@@ -1,6 +1,9 @@
 {-# language BangPatterns #-}
 {-# language MagicHash #-}
+{-# language PatternSynonyms #-}
 {-# language RankNTypes #-}
+{-# language TypeOperators #-}
+{-# language ScopedTypeVariables #-}
 
 module Vector.Int
   ( -- Types
@@ -86,6 +89,8 @@ module Vector.Int
   , index1
   , index2
   , index3
+    -- * Custom
+  , ascendingFins
     -- * Unsafe
   , unsafeCoerceVector
     -- * Hide Length
@@ -94,16 +99,22 @@ module Vector.Int
   , length
   ) where
 
-import Prelude (undefined)
+import Prelude hiding (replicate,map,maximum,Bounded,all,show,elem,length,any,all,tail,foldr)
 
+import Arithmetic.Types (Nat#,Fin#,type (<=#),pattern MaybeFinJust#)
 import Arithmetic.Unsafe (Nat#(Nat#))
+import Data.Either.Void (pattern LeftVoid#, pattern RightVoid#)
 import Data.Unlifted (PrimArray#(PrimArray#))
 import Foreign.Storable (sizeOf)
 import GHC.Int (Int)
 import Vector.Eq.Int
 import Vector.Ord.Int
 import Vector.Std.Int
+import Arithmetic.Nat ((<?#),(<=?#),pattern N0#)
+import Control.Monad.ST (ST,runST)
 
+import qualified Arithmetic.Fin as Fin
+import qualified Arithmetic.Nat as Nat
 import qualified GHC.Exts as Exts
 
 length :: Vector n a -> Nat# n
@@ -111,3 +122,19 @@ length :: Vector n a -> Nat# n
 length !v = case expose v of
   PrimArray# x -> case (sizeOf (undefined :: Int)) of
     Exts.I# i -> Nat# (Exts.quotInt# (Exts.sizeofByteArray# x) i)
+
+ascendingFins :: forall n.
+     Nat# n
+  -> Vector n (Fin# n)
+{-# noinline ascendingFins #-}
+ascendingFins n = case Nat.testZero# n of
+  LeftVoid# zeqn -> substitute zeqn empty
+  RightVoid# zltn -> runST $ do
+    let !zeroFin = Fin.construct# zltn N0#
+    dst <- initialized n zeroFin
+    let go (ix :: Fin# n) = do
+          write dst ix ix
+          case Fin.succ# n ix of
+            MaybeFinJust# ix' -> go ix'
+            _ -> unsafeFreeze dst
+    go zeroFin
