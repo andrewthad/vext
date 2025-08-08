@@ -53,8 +53,23 @@ module Vector.Int64
   , empty
   , empty#
   , empty_
+  , construct1
+  , construct2
   , construct3
   , construct4
+  , construct5
+  , construct6
+  , construct7
+  , construct1#
+  , construct2#
+  , construct3#
+  , construct4#
+  , construct7#
+  , construct1_
+  , construct2_
+  , construct3_
+  , construct4_
+  , construct7_
   , append
   , clone
   , cloneSlice
@@ -66,6 +81,8 @@ module Vector.Int64
     -- * Ordered
   , unique
   , equals
+  , elem
+  , findIndexEq
   , maximum
   , maximumSlice
   , maximumSliceInitial
@@ -82,13 +99,14 @@ module Vector.Int64
   , cloneFromByteArray
   ) where
 
-import Prelude hiding (replicate,map,maximum,Bounded,all,foldr,show,minimum)
+import Prelude hiding (replicate,map,maximum,Bounded,all,foldr,show,minimum,elem)
 
 import Arithmetic.Types (Nat#)
 import Data.Primitive (ByteArray)
 import GHC.Exts (Int64#)
 import GHC.Int (Int64(I64#))
 
+import Vector.Eq.Int64
 import Vector.Std.Int64
 import Vector.Ord.Int64
 

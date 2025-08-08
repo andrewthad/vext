@@ -80,6 +80,9 @@ module Vector.Int
   , maximum
   , maximumSlice
   , maximumSliceInitial
+  , minimum
+  , minimumSlice
+  , minimumSliceInitial
   , bubbleSort
   , bubbleSortSlice
   , bubbleSortSliceInPlace
@@ -99,7 +102,7 @@ module Vector.Int
   , length
   ) where
 
-import Prelude hiding (replicate,map,maximum,Bounded,all,show,elem,length,any,all,tail,foldr)
+import Prelude hiding (replicate,map,maximum,minimum,Bounded,all,show,elem,length,any,all,tail,foldr)
 
 import Arithmetic.Types (Nat#,Fin#,type (<=#),pattern MaybeFinJust#)
 import Arithmetic.Unsafe (Nat#(Nat#))

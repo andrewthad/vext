@@ -231,7 +231,6 @@ library inst
     , Vector.Std.Int16
     , Vector.Std.Int32
     , Vector.Std.Int
-    , Vector.Eq.Int
     , Vector.Ord.Int
     , Vector.Ord.Int8
     , Vector.Ord.Int16
@@ -245,9 +244,11 @@ library inst
     , Vector.Eq.Word32
     , Vector.Eq.Word64
     , Vector.Eq.Word128
+    , Vector.Eq.Int
     , Vector.Eq.Int8
     , Vector.Eq.Int16
     , Vector.Eq.Int32
+    , Vector.Eq.Int64
     , Vector.Masked.Word128
     , Vector.Masked.Word16
     , Vector.Masked.Int64
@@ -407,6 +408,7 @@ library inst
     vext:ord-indef (OrdVector as Vector.Ord.Int64) requires (Element as Int64, Rep as Int64),
     vext:rep-eq-indef (EqVector as Vector.Eq.Int) requires (Element as Int, Rep as Int),
     vext:rep-eq-indef (EqVector as Vector.Eq.Int32) requires (Element as Int32, Rep as Int32),
+    vext:rep-eq-indef (EqVector as Vector.Eq.Int64) requires (Element as Int64, Rep as Int64),
     vext:rep-eq-indef (EqVector as Vector.Eq.Int16) requires (Element as Int16, Rep as Int16),
     vext:rep-eq-indef (EqVector as Vector.Eq.Int8) requires (Element as Int8, Rep as Int8),
     vext:rep-eq-indef (EqVector as Vector.Eq.Word8) requires (Element as Word8, Rep as Word8),
