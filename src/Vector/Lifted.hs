@@ -39,6 +39,7 @@ module Vector.Lifted
   , freeze#
   , freezeSlice#
     -- * Copy
+  , copySlice
   , thaw
     -- * Composite
   , tail

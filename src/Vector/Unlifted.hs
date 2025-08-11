@@ -32,6 +32,7 @@ module Vector.Unlifted
   , freeze#
   , freezeSlice#
     -- * Copy
+  , copySlice
   , thaw
     -- * Composite
   , tail
