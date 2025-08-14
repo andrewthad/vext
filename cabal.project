@@ -3,5 +3,10 @@ packages: .
 
 source-repository-package
   type: git
+  location: https://github.com/byteverse/unlifted
+  tag: 4aace50267555fe47e56a88a6bf4e4ef3a52f6c8
+
+source-repository-package
+  type: git
   location: https://github.com/byteverse/natural-arithmetic
   tag: fd7b09e35495fa76ae2b63d68fabcae913c3f16c
