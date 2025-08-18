@@ -52,8 +52,6 @@ module Vector.Int32
   , all
   , findIndex
   , map
-  , cons
-  , snoc
   , traverse_
   , itraverse_
   , itraverse_#
