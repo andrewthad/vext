@@ -43,6 +43,13 @@ module Vector.Word64
     -- * Copy
   , thaw
     -- * Composite
+  , tail
+  , cons
+  , snoc
+  , replaceAt
+  , any
+  , all
+  , findIndex
   , map
   , traverse_
   , traverseZip_
@@ -84,7 +91,7 @@ module Vector.Word64
   , with
   ) where
 
-import Prelude hiding (replicate,map,maximum,Bounded,all,elem,show,sum)
+import Prelude hiding (replicate,map,maximum,Bounded,all,elem,show,sum,any,tail)
 
 import Arithmetic.Unsafe (Nat#(Nat#))
 import Data.Primitive (ByteArray)

@@ -44,7 +44,16 @@ module Vector.Int32
     -- * Copy
   , thaw
     -- * Composite
+  , tail
+  , cons
+  , snoc
+  , replaceAt
+  , any
+  , all
+  , findIndex
   , map
+  , cons
+  , snoc
   , traverse_
   , itraverse_
   , itraverse_#
@@ -93,7 +102,7 @@ module Vector.Int32
   , cloneFromByteArray
   ) where
 
-import Prelude hiding (replicate,map,maximum,Bounded,all,show)
+import Prelude hiding (replicate,map,maximum,Bounded,all,show,any,tail)
 
 import Vector.Std.Int32
 import Vector.Ord.Int32
