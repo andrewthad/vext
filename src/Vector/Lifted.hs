@@ -55,6 +55,7 @@ module Vector.Lifted
   , itraverse_
   , traverseST#
   , traverseIO
+  , traverseEither
   , generate
   , generateST#
   , foldlM
@@ -113,7 +114,7 @@ import Arithmetic.Types (Fin#)
 import Arithmetic.Unsafe (Nat#(Nat#))
 import Control.Monad.ST (runST,stToIO)
 import Control.Monad.Trans.Class (lift)
-import Control.Monad.Trans.Except (throwE,runExceptT)
+import Control.Monad.Trans.Except (throwE,runExceptT,except)
 import Data.Kind (Type)
 import Data.Maybe.Void (pattern JustVoid#)
 import Data.Primitive (SmallArray(SmallArray))
@@ -198,3 +199,17 @@ traverseIO :: (a -> IO b) -> Nat# n -> Vector n a -> IO (Vector n b)
 {-# inline traverseIO #-}
 traverseIO f n (Vector v) = stToIO $ ST $ \s0 -> case traverseST# (\x s -> case f x of {IO g -> g s}) n v s0 of
   (# s1, v' #) -> (# s1, Vector v' #)
+
+traverseEither :: (a -> Either e b) -> Nat# n -> Vector n a -> Either e (Vector n b)
+{-# inline traverseEither #-}
+traverseEither f n !v = runST $ do
+  dst <- initialized n errorThunk
+  runExceptT $ do
+    Fin.ascendM_# n $ \ix -> do
+      b <- except (f (index v ix))
+      lift (write dst ix b)
+    lift (unsafeFreeze dst)
+
+errorThunk :: a
+{-# noinline errorThunk #-}
+errorThunk = errorWithoutStackTrace "vext:Vector.Lifted: error thunk"
