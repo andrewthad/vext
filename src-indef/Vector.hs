@@ -80,6 +80,7 @@ module Vector
   , itraverse_#
   , foldlM
   , foldrZip
+  , ifoldrZip
   , foldr
   , ifoldr
   , ifoldl'
@@ -328,6 +329,16 @@ foldrZip :: forall (n :: GHC.Nat) (a :: TYPE R) (b :: TYPE R) (c :: Type).
   -> c
 {-# inline foldrZip #-}
 foldrZip f c0 n v1 v2 = Fin.descend# n c0 (\fin c -> f (index v1 fin) (index v2 fin) c)
+
+ifoldrZip :: forall (n :: GHC.Nat) (a :: TYPE R) (b :: TYPE R) (c :: Type).
+     (Fin# n -> a -> b -> c -> c)
+  -> c
+  -> Nat# n
+  -> Vector n a
+  -> Vector n b
+  -> c
+{-# inline ifoldrZip #-}
+ifoldrZip f c0 n v1 v2 = Fin.descend# n c0 (\fin c -> f fin (index v1 fin) (index v2 fin) c)
 
 foldlM :: forall (n :: GHC.Nat) (m :: Type -> Type) (a :: TYPE R) (b :: Type).
      Monad m

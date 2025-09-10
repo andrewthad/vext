@@ -63,6 +63,7 @@ module Vector.Lifted
   , ifoldr
   , foldr
   , foldrZip
+  , ifoldrZip
   , replicate
   , empty
   , empty#
