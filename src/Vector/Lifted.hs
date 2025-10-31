@@ -56,6 +56,7 @@ module Vector.Lifted
   , traverseST#
   , traverseIO
   , traverseEither
+  , traverseEitherZip
   , generate
   , generateST#
   , foldlM
@@ -208,6 +209,16 @@ traverseEither f n !v = runST $ do
     Fin.ascendM_# n $ \ix -> do
       b <- except (f (index v ix))
       lift (write dst ix b)
+    lift (unsafeFreeze dst)
+
+traverseEitherZip :: (a -> b -> Either e c) -> Nat# n -> Vector n a -> Vector n b -> Either e (Vector n c)
+{-# inline traverseEitherZip #-}
+traverseEitherZip f n !v1 !v2 = runST $ do
+  dst <- initialized n errorThunk
+  runExceptT $ do
+    Fin.ascendM_# n $ \ix -> do
+      c <- except (f (index v1 ix) (index v2 ix))
+      lift (write dst ix c)
     lift (unsafeFreeze dst)
 
 errorThunk :: a
