@@ -12,6 +12,8 @@
 {-# language TypeApplications #-}
 {-# language TypeOperators #-}
 {-# language UnboxedTuples #-}
+{-# language FlexibleContexts #-}
+{-# language UndecidableInstances #-}
 
 -- The only operatations defined in this module are those
 -- that are considered primitive. That is, they cannot be
@@ -82,16 +84,35 @@ import GHC.ST (ST(ST),runST)
 import GHC.TypeNats (type (+))
 import Arithmetic.Types (type (:=:),type (<=),type (<=#))
 import Arithmetic.Types (type (:=:#))
+import Data.Unlifted (Show#(..))
+import Types (LengthWitness(..))
 
 import qualified Element as A
 import qualified Arithmetic.Types as Arithmetic
 import qualified GHC.TypeNats as GHC
+import qualified Arithmetic.Fin as Fin
 
 data Vector :: GHC.Nat -> TYPE R -> Type where
   Vector :: Vector# n a -> Vector n a
 
 newtype Vector# :: GHC.Nat -> TYPE R -> TYPE ('BoxedRep 'Unlifted) where
   Vector# :: A# a -> Vector# n a
+
+showsVector# :: (Show# a, LengthWitness A# ) => Vector# n a -> ShowS
+showsVector# v@(Vector# arr ) s0 =
+  let s1 = ']' : s0
+   in case lengthWitness arr of
+        0# -> '[' : s1
+        n -> case Fin.descend# (Nat# n) s1 (\fin b -> ',' : showsPrec# 0 (index# v fin) b) of
+          ',' : trailing -> '[' : trailing
+          _ -> errorWithoutStackTrace "vext:Core: implementation mistake in showsVector"
+
+instance forall (n :: GHC.Nat) (a :: TYPE R). (Show# a, LengthWitness A# ) => Show# (Vector# n a) where
+  showsPrec# _ v s0 = showsVector# v s0
+  show# v = showsVector# v ""
+
+instance forall (n :: GHC.Nat) (a :: TYPE R). (Show# a, LengthWitness A# ) => Show (Vector n a) where
+  showsPrec _ (Vector v) s0 = showsVector# v s0
 
 data MutableVector :: Type -> GHC.Nat -> TYPE R -> Type where
   MutableVector :: MutableVector# s n a -> MutableVector s n a
