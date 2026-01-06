@@ -15,6 +15,7 @@
 {-# language UnboxedSums #-}
 {-# language UnboxedTuples #-}
 {-# language UnliftedNewtypes #-}
+{-# language ViewPatterns #-}
 
 -- The only operatations defined in this module are those
 -- that are considered primitive. That is, they cannot be
@@ -29,6 +30,8 @@ module Vector
   , Bounded(..)
   , Vector_(..)
   , FromMutability#
+  , pattern Construct1
+  , pattern Construct2
   , vector_
     -- * Primitives
   , C.write#
@@ -631,3 +634,26 @@ tail :: forall n a. Nat# n -> Vector (n + 1) a -> Vector n a
 tail n v = runST $ do
   dst <- C.thawSlice (Lte.substituteL# (Plus.commutative# @n @1 (# #)) (Lte.reflexive# @(n + 1) (# #))) v N1# n
   unsafeFreeze dst
+
+pattern Construct1 :: a -> Vector 1 a
+pattern Construct1 a <- (flipIndex (Fin.construct# (Lt.zero# (# #)) N0# ) -> a)
+  where
+  Construct1 x = construct1 x
+
+pattern Construct2 :: forall (a :: TYPE R). a -> a -> Vector 2 a
+pattern Construct2 x y <- (deconstruct2 -> Pair x y)
+  where
+  Construct2 x y = construct2 x y
+
+type Pair :: TYPE R -> Type
+data Pair (a :: TYPE R) = Pair a a
+
+flipIndex :: forall (n :: GHC.Nat) (a :: TYPE R).
+     Fin# n
+  -> Vector n a
+  -> a
+{-# inline flipIndex #-}
+flipIndex i x = C.index x i
+
+deconstruct2 :: forall (a :: TYPE R). Vector 2 a -> Pair a
+deconstruct2 v = Pair (index @2 @a v (Fin.construct# (Lt.constant# (# #)) N0# )) (index @2 @a v (Fin.construct# (Lt.constant# (# #)) N1# ))

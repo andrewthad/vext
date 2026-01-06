@@ -5,6 +5,7 @@
 {-# language KindSignatures #-}
 {-# language MagicHash #-}
 {-# language RankNTypes #-}
+{-# language PatternSynonyms #-}
 
 module Vector.Lifted
   ( -- Types
@@ -15,6 +16,9 @@ module Vector.Lifted
   , Bounded(..)
   , Vector_(..)
   , FromMutability#
+    -- * Patterns
+  , pattern Construct1
+  , pattern Construct2
     -- * Primitives
   , write#
   , write
