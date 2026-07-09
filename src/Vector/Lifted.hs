@@ -79,6 +79,9 @@ module Vector.Lifted
   , construct3
   , construct4
   , construct5
+  , construct6
+  , construct7
+  , construct8
   , construct1#
   , construct2#
   , construct3#

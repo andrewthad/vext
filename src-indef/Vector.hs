@@ -97,11 +97,13 @@ module Vector
   , construct5
   , construct6
   , construct7
+  , construct8
   , construct1#
   , construct2#
   , construct3#
   , construct4#
   , construct7#
+  , construct8#
   , construct1_
   , construct2_
   , construct3_
@@ -457,6 +459,18 @@ construct7 x0 x1 x2 x3 x4 x5 x6 = runST $ do
   C.write dst (Fin.construct# (Lt.constant# (# #)) (Nat.constant# @6 (# #))) x6
   C.unsafeFreeze dst
 
+construct8 :: a -> a -> a -> a -> a -> a -> a -> a -> Vector 8 a
+construct8 x0 x1 x2 x3 x4 x5 x6 x7 = runST $ do
+  dst <- C.initialized (Nat.constant# @8 (# #)) x0
+  C.write dst (Fin.construct# (Lt.constant# (# #)) (Nat.constant# @1 (# #))) x1
+  C.write dst (Fin.construct# (Lt.constant# (# #)) (Nat.constant# @2 (# #))) x2
+  C.write dst (Fin.construct# (Lt.constant# (# #)) (Nat.constant# @3 (# #))) x3
+  C.write dst (Fin.construct# (Lt.constant# (# #)) (Nat.constant# @4 (# #))) x4
+  C.write dst (Fin.construct# (Lt.constant# (# #)) (Nat.constant# @5 (# #))) x5
+  C.write dst (Fin.construct# (Lt.constant# (# #)) (Nat.constant# @6 (# #))) x6
+  C.write dst (Fin.construct# (Lt.constant# (# #)) (Nat.constant# @7 (# #))) x7
+  C.unsafeFreeze dst
+
 construct4 :: a -> a -> a -> a -> Vector 4 a
 construct4 x0 x1 x2 x3 = runST $ do
   dst <- C.initialized (Nat.constant# @4 (# #)) x0
@@ -507,6 +521,9 @@ construct4# x0 x1 x2 x3 = unlift (construct4 x0 x1 x2 x3)
 
 construct7# :: a -> a -> a -> a -> a -> a -> a -> Vector# 7 a
 construct7# x0 x1 x2 x3 x4 x5 x6 = unlift (construct7 x0 x1 x2 x3 x4 x5 x6)
+
+construct8# :: a -> a -> a -> a -> a -> a -> a -> a -> Vector# 8 a
+construct8# x0 x1 x2 x3 x4 x5 x6 x7 = unlift (construct8 x0 x1 x2 x3 x4 x5 x6 x7)
 
 construct1 :: a -> Vector 1 a
 construct1 x0 = runST $ do
